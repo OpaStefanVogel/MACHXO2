@@ -1,0 +1,540 @@
+( Fehlersuch Steckenbleiber - immer noch nicht geschafft!!!
+: MACRAWSENDR           ( hier kann noch WIZ_RX_VON raus!!!
+18 2D04 !
+  F400 C@ 12 = NOT DROP 1 IF ( kein RTNET )
+    F402 C@ 0FF = NOT IF
+      ( CR F400 38 BDUMP ( vorerst )
+(      CR UHR ? F400 10 BDUMP ( auch vorerst )
+      END_IF
+    ELSE WIZ_BUF @ F400 DO  ( RTNET )
+38 2D04 !
+      WIZ_SEND_OPEN
+      8 2 DO 
+        WIZ_RX_VON @ 6 + I + SOCKET_RX_RECH L WIZ_SEND_BYTE 
+        LOOP
+      0E 8 DO 
+        WIZ_RX_VON @ 6 - I + SOCKET_RX_RECH L WIZ_SEND_BYTE 
+        LOOP
+      12 WIZ_SEND_BYTE 34 WIZ_SEND_BYTE
+      00 EMIT 00 EMIT TX_ADDR @ TX_ADDR_MERK !
+      I 12 + I 10 + @ I 11 + @ 100 * + KOMPLETT_INTERPRET
+      TX_ADDR @ TX_ADDR_MERK @ 
+      2DUP - SWAP 2 - TX_ADDR ! 
+      CAP @ >R 0 CAP ! DUP EMIT 0 SWAP 100 U* DROP EMIT R> CAP !
+      TX_ADDR !
+      WIZ_SEND_SEND
+      I @ 100 * I 1 + @ + +LOOP
+      END_IF
+78 2D04 !
+  ;
+REPLACE: MACRAWSEND MACRAWSENDR ;
+
+
+( ENTFERNE WIZ_RESPONSE
+: WIZ_RESPONSER
+1 2D04 !
+  0028 SOCKET_VAR_RECH LL WIZ_RX_VON !
+  002A SOCKET_VAR_RECH LL WIZ_RX_BIS !
+3 2D04 !
+  WIZ_RX_VON @ WIZ_RX_BIS @ - IF
+7 2D04 !
+    1 WIZ_COUNTER +!
+    SOCKET_VAR_ADR @ 100 = IF ( bei UDP muss MAC gefuellt werden
+      WIZ_RX_VON @ SOCKET_RX_RECH LL 000C SOCKET_VAR_RECH MM 2 WIZ_RX_VON +!
+      WIZ_RX_VON @ SOCKET_RX_RECH LL 000E SOCKET_VAR_RECH MM 2 WIZ_RX_VON +!
+      WIZ_RX_VON @ SOCKET_RX_RECH LL 0010 SOCKET_VAR_RECH MM 2 WIZ_RX_VON +!
+      2 WIZ_RX_VON +!
+      END_IF
+    
+    ( WIZ nur auslesen
+    F400 WIZ_BUF !
+    WIZ_RX_VON @
+    BEGIN 
+      WIZ_RX_VON @ SOCKET_RX_RECH L WIZ_BUF @ C!
+      1 WIZ_RX_VON +! 1 WIZ_BUF +!
+      WIZ_RX_VON @ WIZ_RX_BIS @ = UNTIL
+    WIZ_RX_VON !
+    WIZ_RX_BIS @ 0028 SOCKET_VAR_RECH MM ( warum das nicht geht
+    40 0001 SOCKET_VAR_RECH M
+    
+    ( ab hier antworten
+0F 2D04 !
+    SOCKET_VAR_ADR @ 0 = IF ( MACRAWSEND ) ELSE
+      F400 WIZ_BUF @ F400 - 
+      ( CR 2DUP B.
+      ( CR 2DUP DUMP
+      CAP @ 1 AND IF CR 2DUP TYPE END_IF
+      SOCKET_VAR_ADR @ 100 = IF
+        WIZ_TYPE_INTERPRET ( nur hier WIZ_OPEN ... WIZ_SEND )
+        ELSE WIZ_TYPE_INTERPRET END_IF ( hier nochmal GET neu )
+      END_IF
+    
+    END_IF
+  ; HERE . BZEIG ? TLISTENZEIGER ?
+
+REPLACE: WIZ_RESPONSE WIZ_RESPONSER ;
+
+
+
+
+( Fehlersuch Takt 0
+ENTFERNE DAUERDINGS
+BEFESTIGE DAUERDINGS
+
+: EXXI
+  2C2C @ >R UHRL @ >R
+  0 2C2C !
+  ( STAT @ STATMERK ! 0 STAT ! ( nicht mehr wg. WIZ_INTERPRET
+  TLISTE
+  BEGIN DUP TLISTENZEIGER @ < WHILE
+    DUP >R @ EXECUTE R> 1+ REPEAT DROP
+  ( STATMERK @ STAT ! 
+  R> 2C2C ! UHRL @ R> - EXXIUHR ! 
+  ;
+( ' EXXI 6 1+ - 6000 OR 6 !
+' EXXI 4000 + 6 ! ( CR geht momentan +F9XX
+
+
+
+
+( fuer midora:
+REPLACE: WEBSOCK 
+  TLISTENZEIGER @ >R TLISTE TLISTENZEIGER !
+  CR F400 200 TYPE CR QUERY 
+  CR 2DUP TYPE
+  ESTADUMP 
+  CR CR
+  DROP F277 1C MOVE
+  F277 1C TYPE
+  R> TLISTENZEIGER !
+  ;
+
+( fuer DHCP:
+REPLACE: ESTABLISH
+
+  ( MAC, IP
+  00 09 M
+  08 0A M
+  DC 0B M
+  94 0C M
+  4A 0D M
+  ED 0E M
+  C0 0F M
+  A8 10 M
+  01 11 M
+  1F 12 M
+  
+  SOCKET_VAR_ADR @ 100 > IF
+    00 ( 13 ) 0004 SOCKET_VAR_RECH M ( Sn_PORT Source Port
+    50 ( 88 ) 0005 SOCKET_VAR_RECH M
+  
+    01 0000 SOCKET_VAR_RECH M ( 01=TCP 02=UDP 61=MAC-Filter/No delayed ACK
+    ( 0003 SOCKET_VAR_RECH L.
+    01 0001 SOCKET_VAR_RECH M ( OPEN
+    ( 0003 SOCKET_VAR_RECH L. ( 13=INIT
+(    BEGIN 0003 SOCKET_VAR_RECH L 13 = UNTIL
+(    02 0001 SOCKET_VAR_RECH M ( LISTEN
+    ( 0003 SOCKET_VAR_RECH L. ( 14=LISTEN
+(    BEGIN 0003 SOCKET_VAR_RECH L 14 = UNTIL
+    END_IF
+  SOCKET_VAR_ADR @ 100 = IF
+    02 4100 M ( 01=TCP 02=UDP 
+    ( 4103 L.
+    00 ( 13 ) 4104 M ( Sn_PORT Source Port ( FF98
+    50 ( 88 ) 4105 M
+
+    01 4101 M ( OPEN
+    ( 4103 L. ( 13=INIT
+(    BEGIN 4103 L DUP 22 = UNTIL
+    ( 4103 L. ( 14=LISTEN
+    END_IF
+  SOCKET_VAR_ADR @ 0 = IF ( hier jetzt endlich das MACRAW, aber Filter wirkt nicht
+    44 0000 SOCKET_VAR_RECH M ( 44=MACRAW+MAC_Filter+No_delayed_ACK
+    ( 0003 SOCKET_VAR_RECH L.
+    01 0001 SOCKET_VAR_RECH M ( 01=OPEN
+    ( 0003 SOCKET_VAR_RECH L. ( 42=MACRAW INIT
+(    BEGIN 0003 SOCKET_VAR_RECH L 42 = UNTIL
+    END_IF
+  ;
+
+
+REPLACE: WIZ_TYPE_INTERPRET ( adr n --> )
+(  CR 2DUP B.
+(  CR 2DUP BDUMP
+  IF 
+    DUP COUNT
+    SOCKET_VAR_ADR ( NETCAT_BIT ) @ 100 = IF
+      WIZ_SEND_OPEN
+      1B EMIT 5B EMIT 41 EMIT ( ^[[A Kursor 1 hoch, aber nur netcat
+      2DUP TYPE 20 EMIT 
+      DUP IF INTERPRET ELSE 2DROP END_IF 
+      STAT @ 0= IF ." ok" ELSE ." oh" END_IF CR
+      WIZ_SEND_SEND
+      ELSE 
+        OVER 3 " GET" Z= NOT IF
+(          CR CR 2DUP DUMP CR 
+          OVER C@ 0F AND 08 = IF ." DISCON " 7 EMIT ( DISCON
+            WIZ_SEND_OPEN
+            ( 81 EMIT 05 EMIT ." HELLO"
+            89 EMIT 02 EMIT 00 EMIT 00 EMIT
+            WIZ_SEND_SEND
+            08 0001 SOCKET_VAR_RECH M ( DISCON SOCKET )
+            END_IF
+          OVER C@ 0F AND 09 = IF ." PING" 7 EMIT END_IF
+          OVER C@ 0F AND 0A = IF ." PONG" 7 EMIT END_IF
+          OVER C@ 0F AND 03 < IF WEBSOCKET_MESSAGE END_IF
+          2DROP
+          ELSE
+            OVER E " GET /WEBSOCKET" Z= IF
+              " WEBSOCK" INTERPRET
+              WIZ_SEND_OPEN
+              SOCKETFILE
+              WIZ_SEND_SEND
+              ELSE
+                WIZ_SEND_OPEN
+                INTERPRET
+                WIZ_SEND_SEND
+                END_IF 
+            END_IF
+        END_IF
+    ELSE DROP END_IF
+  ;
+
+: WIZ_RESPONSE
+SOCKET_VAR_ADR @ IF
+  0028 SOCKET_VAR_RECH LL WIZ_RX_VON !
+  002A SOCKET_VAR_RECH LL WIZ_RX_BIS !
+  WIZ_RX_VON @ WIZ_RX_BIS @ - IF
+    1 WIZ_COUNTER +!
+    SOCKET_VAR_ADR @ 100 = IF ( bei UDP muss MAC gefuellt werden
+      WIZ_RX_VON @ SOCKET_RX_RECH LL 000C SOCKET_VAR_RECH MM 2 WIZ_RX_VON +!
+      WIZ_RX_VON @ SOCKET_RX_RECH LL 000E SOCKET_VAR_RECH MM 2 WIZ_RX_VON +!
+      WIZ_RX_VON @ SOCKET_RX_RECH LL 0010 SOCKET_VAR_RECH MM 2 WIZ_RX_VON +!
+      2 WIZ_RX_VON +!
+      END_IF
+    
+    ( WIZ nur auslesen
+    F400 WIZ_BUF !
+    WIZ_RX_VON @
+    BEGIN 
+      WIZ_RX_VON @ SOCKET_RX_RECH L WIZ_BUF @ C!
+      1 WIZ_RX_VON +! 1 WIZ_BUF +!
+      WIZ_RX_VON @ WIZ_RX_BIS @ = UNTIL
+    WIZ_RX_VON !
+    WIZ_RX_BIS @ 0028 SOCKET_VAR_RECH MM ( warum das nicht geht
+    40 0001 SOCKET_VAR_RECH M
+    
+    ( ab hier antworten
+    SOCKET_VAR_ADR @ 0 = IF MACRAWSEND ELSE
+      F400 WIZ_BUF @ F400 - 
+      ( CR 2DUP B.
+      ( CR 2DUP DUMP
+      CAP @ 1 AND IF CR 2DUP TYPE END_IF
+      SOCKET_VAR_ADR @ 100 = IF
+        WIZ_TYPE_INTERPRET ( nur hier WIZ_OPEN ... WIZ_SEND )
+        ELSE WIZ_TYPE_INTERPRET END_IF ( hier nochmal GET neu )
+      END_IF
+    
+    END_IF
+END_IF
+  ; HERE . BZEIG ? TLISTENZEIGER ?
+
+4100 40 LDUMP ( UDPDUMP )
+
+FORGET W!
+FORGET UDPS
+: UDPS ( ein UDP-DHCP Sendeversuch )
+  ( C0 ) 00 0F M ( Source-IP
+  ( A8 ) 00 10 M
+  ( 01 ) 00 11 M
+  ( 1F ) 00 12 M
+  100 SOCKET_VAR_ADR !
+  SOCKET_VAR_ADR @ 8 * DUP SOCKET_RX_ADR ! SOCKET_TX_ADR !
+  00 ( 13 ) 4104 M ( Sn_PORT Source Port ( 0044 bootpc
+  44 ( 88 ) 4105 M
+  FF ( 88 ) 4106 M ( Ziel-Mac
+  FF ( 88 ) 4107 M
+  FF ( 88 ) 4108 M
+  FF ( 88 ) 4109 M
+  FF ( 88 ) 410A M
+  FF ( 88 ) 410B M
+  FF ( 88 ) 410C M ( Ziel-IP
+  FF ( 88 ) 410D M
+  FF ( 88 ) 410E M
+  FF ( 88 ) 410F M
+  00 ( 13 ) 4110 M ( Sn_PORT Destination Port ( 0043 bootpc
+  43 ( 88 ) 4111 M
+  WIZ_SEND_OPEN
+(      1B EMIT 5B EMIT 41 EMIT ( ^[[A Kursor 1 hoch, aber nur netcat
+(      2DUP TYPE 20 EMIT 
+(      DUP IF INTERPRET ELSE 2DROP END_IF 
+(      STAT @ 0= IF ." ok" ELSE ." oh" END_IF CR
+
+( 80 0 DO 0 EMIT LOOP
+01 EMIT 01 EMIT 06 EMIT 00 EMIT 39 EMIT UHRH @ EMIT 
+UHR @ EMIT UHRL @ EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( K....... */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 08 EMIT ( ........ */
+DC EMIT 94 EMIT 4A EMIT ED EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 63 EMIT 82 EMIT ( ......c. */
+53 EMIT 63 EMIT 35 EMIT 01 EMIT 01 EMIT 32 EMIT 04 EMIT 00 EMIT ( Sc5..2.. */
+00 EMIT 00 EMIT 00 EMIT 39 EMIT 02 EMIT 02 EMIT 40 EMIT 37 EMIT ( .. 9..@7 */
+07 EMIT FC EMIT 03 EMIT 2A EMIT 0F EMIT 06 EMIT 01 EMIT 0C EMIT ( ...*.... */
+3D EMIT 07 EMIT 01 EMIT 00 EMIT 08 EMIT DC EMIT 94 EMIT 4A EMIT ( =....... */
+ED EMIT 0C EMIT 0A EMIT 4D EMIT 41 EMIT 43 EMIT 48 EMIT 58 EMIT ( ...MACHX */
+4F EMIT 32 EMIT 57 EMIT 69 EMIT 5A EMIT FF EMIT 00 EMIT 00 EMIT ( O2WiZ... */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT ( ........ */
+00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT 00 EMIT
+  WIZ_SEND_SEND
+  ;
+
+
+
+
+
+( fuer SPI: ##################################
+0 VARIABLE D031MERK
+0 VARIABLE D032MERK
+0 VARIABLE INT14COUNT
+: INT14
+  1 INT14COUNT +!
+  D031 @ 2D04 !  
+  ;
+' INT14 4000 + 14 !
+: TT
+  D031 @ D032 @ OVER D031MERK @ = OVER D032MERK @ = AND NOT IF
+    OVER D031MERK ! 
+    DUP D032MERK !
+    FESTPOSITION . . INT14COUNT ? RUCKPOSITION ELSE 2DROP END_IF ;
+: P D032 ? D031 ? ;
+BEFESTIGE TT
+( ENTFERNE TT
+
+( cd /sys/class/gpio
+( ls
+( echo 2 > export
+( ls
+( cd gpio2
+( echo out > direction
+( echo 1 value
+( echo 0 value
+( echo 2 > /sys/class/gpio/unexport
+
+( SPI_CLK: SPI0_SCLK-->GPIO2-->22==>44-->MCLK/CCLK-->
+( echo 2 > /sys/class/gpio/export
+( echo out > /sys/class/gpio/gpio2/direction
+( echo 1 > /sys/class/gpio/gpio2/value
+( echo 0 > /sys/class/gpio/gpio2/value
+( echo 2 > /sys/class/gpio/unexport
+
+( SPI_MOSI: SPI0_D0-->GPIO3-->21==>71-->SI/SISPI-->
+( echo 3 > /sys/class/gpio/export
+( echo out > /sys/class/gpio/gpio3/direction
+( echo 1 > /sys/class/gpio/gpio3/value
+( echo 0 > /sys/class/gpio/gpio3/value
+( echo 3 > /sys/class/gpio/unexport
+
+( SPI_???: ........-->GPIO4-?>17/18==>45-->SO/SPISO-->
+( echo 4 > /sys/class/gpio/export
+( echo out > /sys/class/gpio/gpio4/direction
+( echo 1 > /sys/class/gpio/gpio4/value
+( echo 0 > /sys/class/gpio/gpio4/value
+( echo 4 > /sys/class/gpio/unexport
+
+( SPI_???: ........-->GPIO5-?>18/17==>70-->SN-->
+( echo 5 > /sys/class/gpio/export
+( echo out > /sys/class/gpio/gpio5/direction
+( echo 1 > /sys/class/gpio/gpio5/value
+( echo 0 > /sys/class/gpio/gpio5/value
+( echo 5 > /sys/class/gpio/unexport
+
+( SPI_???: ........-->GPIO4-?>17/18==>45-->SO/SPISO-->
+( echo 48 > /sys/class/gpio/export
+( echo out > /sys/class/gpio/gpio48/direction
+( echo 1 > /sys/class/gpio/gpio48/value
+( echo 0 > /sys/class/gpio/gpio48/value
+( echo 48 > /sys/class/gpio/unexport
+
+( SPI_???: ........-->GPIO5-?>18/17==>70-->SN-->
+( echo 51 > /sys/class/gpio/export
+( echo out > /sys/class/gpio/gpio51/direction
+( echo 1 > /sys/class/gpio/gpio51/value
+( echo 0 > /sys/class/gpio/gpio51/value
+( echo 51 > /sys/class/gpio/unexport
+
+( SPI_???: ........-->GPIO4-?>17/18==>45-->SO/SPISO-->
+( echo 31 > /sys/class/gpio/export
+( echo out > /sys/class/gpio/gpio31/direction
+( echo 1 > /sys/class/gpio/gpio31/value
+( echo 0 > /sys/class/gpio/gpio31/value
+( echo 31 > /sys/class/gpio/unexport
+
+( SPI_???: ........-->GPIO5-?>18/17==>70-->SN-->
+( echo 40 > /sys/class/gpio/export
+( echo out > /sys/class/gpio/gpio40/direction
+( echo 1 > /sys/class/gpio/gpio40/value
+( echo 0 > /sys/class/gpio/gpio40/value
+( echo 40 > /sys/class/gpio/unexport
+
+( SPI_???: ........-->GPIO4-?>17/18==>45-->SO/SPISO-->
+( echo 30 > /sys/class/gpio/export
+( echo out > /sys/class/gpio/gpio30/direction
+( echo 1 > /sys/class/gpio/gpio30/value
+( echo 0 > /sys/class/gpio/gpio30/value
+( echo 30 > /sys/class/gpio/unexport
+
+( SPI_???: ........-->GPIO5-?>18/17==>70-->SN-->
+( echo 60 > /sys/class/gpio/export
+( echo out > /sys/class/gpio/gpio60/direction
+( echo 1 > /sys/class/gpio/gpio60/value
+( echo 0 > /sys/class/gpio/gpio60/value
+( echo 60 > /sys/class/gpio/unexport
+
+( cat /sys/class/gpio/gpio*/value
+
+
+echo 2 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio2/direction
+echo 1 > /sys/class/gpio/gpio2/value
+echo 3 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio3/direction
+echo 1 > /sys/class/gpio/gpio3/value
+echo 4 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio4/direction
+echo 1 > /sys/class/gpio/gpio4/value
+echo 5 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio5/direction
+echo 1 > /sys/class/gpio/gpio5/value
+echo 48 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio48/direction
+echo 1 > /sys/class/gpio/gpio48/value
+echo 51 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio51/direction
+echo 1 > /sys/class/gpio/gpio51/value
+echo 31 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio31/direction
+echo 1 > /sys/class/gpio/gpio31/value
+echo 40 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio40/direction
+echo 1 > /sys/class/gpio/gpio40/value
+echo 30 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio30/direction
+echo 1 > /sys/class/gpio/gpio30/value
+echo 60 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio60/direction
+echo 1 > /sys/class/gpio/gpio60/value
+ls /sys/class/gpio/gpio*/value
+cat /sys/class/gpio/gpio*/value
+//
+b.pinMode(SPI_CLK,'out');
+b.pinMode(SPI_MOSI,'out');
+
+var b = require('bonescript');
+var SPI_CLK = "P9_22";
+var SPI_MOSI = "P9_21";
+b.digitalWrite(SPI_CLK,0);
+
+SendByte = function(Byte) {
+  b.digitalWrite(SPI_MOSI,0);
+  b.digitalWrite(SPI_CLK,1);
+  b.digitalWrite(SPI_CLK,0);
+  b.digitalWrite(SPI_MOSI,1);
+  b.digitalWrite(SPI_CLK,1);
+  b.digitalWrite(SPI_CLK,0);
+  b.digitalWrite(SPI_MOSI,0);
+  b.digitalWrite(SPI_CLK,1);
+  b.digitalWrite(SPI_CLK,0);
+  b.digitalWrite(SPI_MOSI,1);
+  b.digitalWrite(SPI_CLK,1);
+  b.digitalWrite(SPI_CLK,0);
+  b.digitalWrite(SPI_MOSI,1);
+  b.digitalWrite(SPI_CLK,1);
+  b.digitalWrite(SPI_CLK,0);
+  b.digitalWrite(SPI_MOSI,0);
+  b.digitalWrite(SPI_CLK,1);
+  b.digitalWrite(SPI_CLK,0);
+  b.digitalWrite(SPI_MOSI,1);
+  b.digitalWrite(SPI_CLK,1);
+  b.digitalWrite(SPI_CLK,0);
+  b.digitalWrite(SPI_MOSI,0);
+  b.digitalWrite(SPI_CLK,1);
+  b.digitalWrite(SPI_CLK,0);
+  };
+SendByte(63);
+
+( extra:
+echo 50 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio50/direction
+echo 1 > /sys/class/gpio/gpio50/value
+
+b.bitRead(Byte,j)
+
+
+
+
+
+
+
+
+
+
+
+
+
+

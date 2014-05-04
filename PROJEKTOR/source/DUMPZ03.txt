@@ -1,0 +1,1206 @@
+( RS232_RXD an MACHXO2 13
+( RS232_TXD an MACHXO2 14
+
+
+( ============================================================
+( = Lötanschlüsse: WIZ links    rechts WIZ                   =
+( =                 1 GND         GND   1                    =
+( = Lattice         2 GND         3V3   2                    =
+( = O L 10   rosa   3 MOSI I      3V3   3            Lattice =
+( = O L  6   blau   4 SCLK I    I PWD   4   rotblau    1 L O =
+( = O H  4   weiß   5 nSS  I    I nREST 5   grauweiß   3 H O =
+( = I    2    rot   6 nINT O    O MISO  6   grau       5   I =
+( ============================================================
+
+( ============================================================
+( = Lötanschlüsse SPI                                        =
+( =            MACHXO2            BeagleBone P9              =
+( = SPI_CLK    MCLK/CCLK  44      22  spi0_sclk  gpio0[2]    =  
+( = SPI_MOSI   SISPI      71      21  spi0_dO    gpio0[3]    =
+( = SPI_MISO   SPISO      45      18  spi0_d1    gpio0[4]    =
+( = SPI_CS     SN         70      17  spi0_cs0   gpio0[5]    =
+( ============================================================
+
+
+( Adressverteilung 
+
+( 2C08 P13 WIZ_nSS
+( --2C09 P15 WIZ_SCK
+( 2C0A P13 WIZ_PWDN
+( 2C0B P13 WIZ_nRESET
+( --2C10 P15 VARIANTE
+( 2C11 P15 RST
+( 2C1C P31 PAUSENBIT
+( 2C1D P31 DREIPHASENBIT
+( 2C20 P11 LED0
+( 2C21 P11 LED1
+( 2C22 P11 LED2
+( 2C23 P11 LED3
+( 2C24 P11 LED4
+( 2C25 P11 LED5
+( 2C26 P11 LED6
+( 2C27 P11 LED7
+( --2C2B P15 SPI_MOSI
+( 2C2C P10 Taktumschaltung
+( --2C30 P17 UFM
+( 2C31 P17 SPI_MOSI
+( 2C40 P16 OUTPUT(0)
+( 2C41 P16 OUTPUT(1)
+( 2C42 P16 OUTPUT(2)
+( 2C43 P16 OUTPUT(3)
+( 2C44 P16 OUTPUT(4)
+( 2C45 P16 OUTPUT(5)
+( 2C46 P16 OUTPUT(6)
+( 2C47 P16 OUTPUT(7)
+( 2C48 P16 OUTPUT(8)
+( 2C49 P16 OUTPUT(9)
+( 2C4A P16 OUTPUT(10)
+( 2C4B P16 OUTPUT(11)
+( 2C4C P16 OUTPUT(12)
+( 2C4D P16 OUTPUT(13)
+( 2C4E P16 OUTPUT(14)
+( 2C4F P16 OUTPUT(15)
+( 2C50 P16 OUTPUT(16)
+( 2C51 P16 OUTPUT(17)
+( 2C52 P16 OUTPUT(18)
+( 2C53 P16 OUTPUT(19)
+( 2C54 P16 OUTPUT(20)
+( 2C55 P16 OUTPUT(21)
+( 2C56 P16 OUTPUT(22)
+( 2C57 P16 OUTPUT(23)
+( 2D04 P11 LED
+( --2D07 HINWEG
+( 2D10 P15 SPI_INPUT(15 downto 0)
+( 2D11 P15 SPI_INPUT(31 downto 16)
+( 2D12 P15 SPI_INPUT(47 downto 32)
+( --2D14 P16 OUTPUT(15 downto 0)
+( --2D15 P16 OUTPUT(23 downto 16)
+( 2D17 P31 INV_FINTI
+( --2D30 P17 UFM
+( --2D31 P17 UFM
+( --2D32 P17 UFM
+( 2D70 P17 UFM
+( 2D71 P17 UFM
+( 2D72 P17 UFM
+( 2D73 P17 UFM
+
+( D001 SP
+( D002 RP
+( D003 PC
+( --D007 HERBEI
+
+( D004 P10 UHR
+( D005 P31 PORTSCA
+( D00C P01 Fehlersuch LED
+( D00D P10 UHRL
+( D00E P10 UHRH
+( D00F P10 UHRH 1+
+( D010 P16 INPUT [15:0]
+( D011 P16 INPUT [31:16]
+( D012 P16 OUTPUT [15:0]
+( D013 P16 OUTPUT [23:16]
+( D016 P31 DEBUG
+( D017 P31 DEBUG2
+( --D020 P11 REVCOUNTER
+( D028 P15 SPANNU
+( D030 P17 UFM
+( D031 P17 SPI_CLK&SPI_MOSI&SPI_SCSN&"0000"&SPI_BYTE_KOMPLETT
+( D032 P17 SPI_COUNTER
+
+( --D108 P15 SPI_MISO
+( D109 P13 WIZ_nINT
+( D140 P16 INPUT(0)
+( D141 P16 INPUT(1)
+( D142 P16 INPUT(2)
+( D143 P16 INPUT(3)
+( D144 P16 INPUT(4)
+( D145 P16 INPUT(5)
+( weiter bis
+( D15F P16 INPUT(31)
+
+
+( WIZ-Register nach 40002-W5200-Datasheet.pdf
+( 4000 MR MODE
+( 4001 CR Command
+( 4002 IR Interrupt
+( 4003 SR Status
+( 4004/05 PORT Source
+( 4006/0B DHAR MAC Destination
+( 400C/0F DIPR IP Destination
+( 4010/11 DPORT PORT Destination
+( 4012/13 MSS TCP Maximum Segment Size
+( 4014 PROTO Protokollnummer
+( 4015 TOS Typ of service
+( 4016 TTL Time To Live
+
+( 401E RXMEM_SIZE RX Memory Size 2Kb
+( 401F TXMEM_SIZE TX Memory Size 2Kb
+( 4020/21 TX_FSR TX Free Size
+( 4022/23 TX Read Pointer
+( 4024/25 TX Write Pointer
+( 4026/27 RX Received Size
+( 4028/29 RX Read Pointer
+( 402A/2B RX Write Pointer
+( 402C IMR Interrupt Mask
+( 402D/2E FRAG Fragment
+
+( zuerst den Zustand nach DUMPZ2.txt herstellen
+TLISTE TLISTENZEIGER !
+' EXECUTE 4000 + ' EMITCODE ' EMIT 2!
+
+
+( SPI Ansteuerung
+( ab hier aus ZUP97_PROBIER.txt der SFlash:
+-1 CRBIT !
+1 2C08 !
+
+( SPI Ansteuerung
+( ab hier aus ZUP97_PROBIER.txt der SFlash:
+FORGET NIX
+: NIX NOOP ;
+: L ( adr --> byte ) 
+  2D12 ! 0001 2D11 ! 0000 2D10 !
+  1 2C11 !
+  NOOP NOOP NOOP NOOP NOOP NOOP NOOP NOOP NOOP NOOP
+  0 2C11 ! 
+  D028 @ 00FF AND ( >12*12,5MHz Takte später = 48*50MHz = 3*3,125
+  ;
+
+: L. L . ;
+: LDUMP ( adr n -->  <...> )
+  OVER + SWAP DO I L LG. 20 EMIT LOOP ;
+: BDUMP ( adr n -->  <...> )
+  OVER + SWAP DO I C@ LG. 20 EMIT LOOP ;
+: RST1 1 2C0B ! ;
+: RST2 0 2C0B ! ;
+
+: LL ( adr --> dword ) 
+  2D12 ! 0002 2D11 ! 0000 2D10 !
+  1 2C11 !
+  NOOP NOOP NOOP NOOP NOOP NOOP NOOP NOOP NOOP NOOP
+  0 2C11 ! 
+  D028 @ ( >12*12,5MHz Takte später = 48*50MHz = 3*3,125
+  ;
+
+: MM ( word adr --> ) 
+  2D12 ! 8002 2D11 ! 2D10 !
+  1 2C11 !
+  NOOP NOOP NOOP NOOP NOOP NOOP NOOP NOOP NOOP NOOP
+  0 2C11 !
+  ( >12*12,5MHz Takte später = 48*50MHz = 3*3,125
+  ;
+
+: M ( word adr --> ) 
+  2D12 ! 8001 2D11 ! 100 * 2D10 !
+  1 2C11 !
+  NOOP NOOP NOOP NOOP NOOP NOOP NOOP NOOP NOOP NOOP
+  0 2C11 ! 
+  ( >12*12,5MHz Takte später = 48*50MHz = 3*3,125
+  ;
+
+0 VARIABLE SOCKET_VAR_ADR
+0 VARIABLE SOCKET_RX_ADR
+0 VARIABLE SOCKET_TX_ADR
+: SOCKET_VAR_RECH ( adr --> adr' ) 
+  4000 + SOCKET_VAR_ADR @ + ;
+: SOCKET_RX_RECH ( adr --> adr' ) 
+  07FF AND C000 + SOCKET_RX_ADR @ + ;
+: SOCKET_TX_RECH ( adr --> adr' ) 
+  07FF AND 8000 + SOCKET_TX_ADR @ + ;
+  
+  
+0 VARIABLE CAP
+: ESTABLISH
+
+  ( MAC, IP
+  00 09 M
+  08 0A M
+  DC 0B M
+  94 0C M
+  4A 0D M
+  ED 0E M
+  C0 0F M
+  A8 10 M
+  01 11 M
+  1F 12 M
+  
+  SOCKET_VAR_ADR @ 100 > IF
+    00 ( 13 ) 0004 SOCKET_VAR_RECH M ( Sn_PORT Source Port
+    50 ( 88 ) 0005 SOCKET_VAR_RECH M
+  
+    01 0000 SOCKET_VAR_RECH M ( 01=TCP 02=UDP 61=MAC-Filter/No delayed ACK
+    ( 0003 SOCKET_VAR_RECH L.
+    01 0001 SOCKET_VAR_RECH M ( OPEN
+    ( 0003 SOCKET_VAR_RECH L. ( 13=INIT
+(    BEGIN 0003 SOCKET_VAR_RECH L 13 = UNTIL
+(    02 0001 SOCKET_VAR_RECH M ( LISTEN
+    ( 0003 SOCKET_VAR_RECH L. ( 14=LISTEN
+(    BEGIN 0003 SOCKET_VAR_RECH L 14 = UNTIL
+    ELSE SOCKET_VAR_ADR @ 100 = IF
+      02 4100 M ( 01=TCP 02=UDP 
+      ( 4103 L.
+      00 ( 13 ) 4104 M ( Sn_PORT Source Port ( FF98
+      50 ( 88 ) 4105 M
+
+      01 4101 M ( OPEN
+      ( 4103 L. ( 13=INIT
+(      BEGIN 4103 L DUP 22 = UNTIL
+      ( 4103 L. ( 14=LISTEN
+      ELSE ( hier jetzt endlich das MACRAW, aber Filter wirkt nicht
+        44 0000 SOCKET_VAR_RECH M ( 44=MACRAW+MAC_Filter+No_delayed_ACK
+        ( 0003 SOCKET_VAR_RECH L.
+        01 0001 SOCKET_VAR_RECH M ( 01=OPEN
+        ( 0003 SOCKET_VAR_RECH L. ( 42=MACRAW INIT
+(        BEGIN 0003 SOCKET_VAR_RECH L 42 = UNTIL
+        END_IF END_IF  
+  ;
+
+: ESTADUMP
+  4800 4000 DO CR I 14 LDUMP 100 +LOOP 
+  ;
+
+( 22-23 Sn_TX_RD Read Pointer
+( 24-25 Sn_TX_WR Write Pointer
+( 26-27 Sn_RX_RSR Received Size
+( 28-29 Sn_RX_RD Read Pointer
+( 2A-2B Sn_RX_WR Write Pointer
+
+0 VARIABLE TX_ADDR 
+0 VARIABLE TX_ADDR_MERK
+0 VARIABLE WIZ_OPENBIT
+0 VARIABLE TX_ANF
+: CRNL 0D EMIT 0A EMIT ;
+
+: WIZ_SEND_OPEN
+  0024 SOCKET_VAR_RECH LL DUP TX_ADDR ! TX_ANF !
+(  0024 SOCKET_VAR_RECH L 100 * 0025 SOCKET_VAR_RECH L + TX_ADDR !
+  -1 WIZ_OPENBIT !
+  ;
+
+: WIZ_SEND_SEND
+  0 WIZ_OPENBIT !
+  TX_ADDR @ 0024 SOCKET_VAR_RECH MM ( auch dieses MM funktioniert nicht
+  20 0001 SOCKET_VAR_RECH M
+  ;
+
+: WIZ_SEND_BYTE ( b --> )
+  TX_ADDR @ 7FF AND SOCKET_TX_RECH M
+  1 TX_ADDR +!
+  TX_ADDR @ TX_ANF @ - 400 > IF
+    TX_ADDR @ DUP TX_ADDR_MERK @ - 
+    TX_ADDR_MERK @ 6 - TX_ADDR ! 
+    HG.
+    TX_ADDR !
+    WIZ_SEND_SEND
+    WIZ_SEND_OPEN
+    CRNL 
+    01B9 HG.
+    CRNL 
+    TX_ADDR @ TX_ADDR_MERK !
+    END_IF
+  ;
+
+: WIZ_EMIT ( b --> )
+  WIZ_OPENBIT @ IF
+    CAP @ 2 AND IF DUP ' EMITCODE EXECUTE END_IF
+    WIZ_SEND_BYTE 
+    ELSE ' EMITCODE EXECUTE END_IF
+  ;
+REPLACE: EMIT WIZ_EMIT ;
+REPLACE: ERROR
+  DUP ERRORNR !
+  00FF 2D04 !
+  CR IN1 @ IN3 @ IN1 @ - 1 - TYPE ." ???"
+  STAT @ >R 0 STAT ! " FEHLERTEXT" INTERPRET R> STAT !
+  CR ." ERROR - Fehler Nummer " . 
+  WIZ_OPENBIT @ 0= IF 0 STAT ! DISABLE QUIT END_IF
+  ;
+
+
+( kommt spaeter zu GETFILE
+: SOCKETFILE ( adr n --> )
+  2DROP
+  ." HTTP/1.1 101 Switching Protocols"
+  CRNL ." Upgrade: websocket"
+  CRNL ." Connection: Upgrade"
+  CRNL ." Sec-WebSocket-Accept: " F277 1C TYPE
+  CRNL CRNL 
+  ; HERE . BZEIG ?
+
+(*REM*)
+: SOCKETFILE ( adr n --> )
+  2DROP
+  ." HTTP/1.1 101 Web Socket Protocol Handshake"
+  CRNL ." Upgrade: websocket"
+  CRNL ." Connection: Upgrade"
+  CRNL ." Sec-WebSocket-Accept: " F277 1C TYPE
+  CRNL ." Server: MachXO2 DeviceID 01 2B 50 43"
+  CRNL ." Date: Mon, 20 Jan 2014"
+  CRNL CRNL 
+  ; HERE . BZEIG ?
+(*END*)
+
+
+( : WEBSOCK NOOP ;
+: WEBSOCK 
+  TLISTENZEIGER @ >R TLISTE TLISTENZEIGER !
+  CR F477 28 TYPE CR QUERY 
+  CR 2DUP TYPE
+  ESTADUMP 
+  CR CR
+  DROP F277 1C MOVE
+  F277 1C TYPE
+  R> TLISTENZEIGER !
+  ;
+
+: WEBSOCKET_MESSAGE
+(  CR WIZ_BUF ? 2DUP B.
+  F400 1+ C@ 7F AND 0 DO
+    F400 I + 6 + C@ 
+    F400 I 03 AND + 2 + C@ 
+    XOR DUP EMIT 
+    F400 I + 6 + C! LOOP
+  F400 6 + F400 1+ C@ 7F AND INTERPRET
+  ;
+
+: WIZ_TYPE_INTERPRET ( adr n --> )
+(  CR 2DUP B.
+(  CR 2DUP BDUMP
+  IF 
+    DUP COUNT
+    SOCKET_VAR_ADR ( NETCAT_BIT ) @ 100 = IF
+      WIZ_SEND_OPEN
+      1B EMIT 5B EMIT 41 EMIT ( ^[[A Kursor 1 hoch, aber nur netcat
+      2DUP TYPE 20 EMIT 
+      DUP IF INTERPRET ELSE 2DROP END_IF 
+      STAT @ 0= IF ." ok" ELSE ." oh" END_IF CR
+      WIZ_SEND_SEND
+      ELSE 
+        OVER 3 " GET" Z= NOT IF
+(          CR CR 2DUP DUMP CR 
+          OVER C@ 0F AND 08 = IF ." DISCON " 7 EMIT ( DISCON
+            WIZ_SEND_OPEN
+            ( 81 EMIT 05 EMIT ." HELLO"
+            89 EMIT 02 EMIT 00 EMIT 00 EMIT
+            WIZ_SEND_SEND
+            08 0001 SOCKET_VAR_RECH M ( DISCON SOCKET )
+            END_IF
+          OVER C@ 0F AND 09 = IF ." PING" 7 EMIT END_IF
+          OVER C@ 0F AND 0A = IF ." PONG" 7 EMIT END_IF
+          OVER C@ 0F AND 03 < IF WEBSOCKET_MESSAGE END_IF
+          2DROP
+          ELSE
+            OVER E " GET /WEBSOCKET" Z= IF
+              " WEBSOCK" INTERPRET
+              WIZ_SEND_OPEN
+              SOCKETFILE
+              WIZ_SEND_SEND
+              ELSE
+                WIZ_SEND_OPEN
+                INTERPRET
+                WIZ_SEND_SEND
+                END_IF 
+            END_IF
+        END_IF
+    ELSE DROP END_IF
+  ;
+
+
+F200 VARIABLE FOLGEZEIGER
+-1 VARIABLE EXTRABIT
+: KOMPLETT_INTERPRET ( adr n -->
+EXTRABIT @ IF 
+  OVER + SWAP DO
+    I C@
+    DUP 20 < IF
+      DROP
+      F200 FOLGEZEIGER @ OVER - 
+      20 EMIT INTERPRET ." ok" CR
+      F200 FOLGEZEIGER !
+      ELSE 
+        DUP EMIT FOLGEZEIGER @ ! 1 FOLGEZEIGER +!
+        END_IF
+    LOOP
+  ELSE 2DROP END_IF
+  ;
+F200 FOLGEZEIGER !
+
+
+0 VARIABLE WIZ_RX_VON
+0 VARIABLE WIZ_RX_BIS
+0 VARIABLE WIZ_BUF
+0 VARIABLE WIZ_COUNTER
+: MACRAWSEND           ( hier kann noch WIZ_RX_VON raus!!!
+  F400 C@ 12 = NOT IF ( kein RTNET )
+    F402 C@ 0FF = NOT IF
+      ( CR F400 38 BDUMP ( vorerst )
+      CR UHR ? F400 10 BDUMP ( auch vorerst )
+      END_IF
+    ELSE WIZ_BUF @ F400 DO  ( RTNET )
+      WIZ_SEND_OPEN
+      8 2 DO 
+        WIZ_RX_VON @ 6 + I + SOCKET_RX_RECH L WIZ_SEND_BYTE 
+        LOOP
+      0E 8 DO 
+        WIZ_RX_VON @ 6 - I + SOCKET_RX_RECH L WIZ_SEND_BYTE 
+        LOOP
+      12 WIZ_SEND_BYTE 34 WIZ_SEND_BYTE
+      00 EMIT 00 EMIT TX_ADDR @ TX_ADDR_MERK !
+      I 12 + I 10 + @ I 11 + @ 100 * + KOMPLETT_INTERPRET
+      TX_ADDR @ TX_ADDR_MERK @ 
+      2DUP - SWAP 2 - TX_ADDR ! 
+      CAP @ >R 0 CAP ! DUP EMIT 0 SWAP 100 U* DROP EMIT R> CAP !
+      TX_ADDR !
+      WIZ_SEND_SEND
+      I @ 100 * I 1 + @ + +LOOP
+      END_IF
+  ;
+
+
+
+( ENTFERNE WIZ_RESPONSE
+: WIZ_RESPONSE
+SOCKET_VAR_ADR @ IF
+  0028 SOCKET_VAR_RECH LL WIZ_RX_VON !
+  002A SOCKET_VAR_RECH LL WIZ_RX_BIS !
+  WIZ_RX_VON @ WIZ_RX_BIS @ - IF
+    1 WIZ_COUNTER +!
+    SOCKET_VAR_ADR @ 100 = IF ( bei UDP muss MAC gefuellt werden
+      WIZ_RX_VON @ SOCKET_RX_RECH LL 000C SOCKET_VAR_RECH MM 2 WIZ_RX_VON +!
+      WIZ_RX_VON @ SOCKET_RX_RECH LL 000E SOCKET_VAR_RECH MM 2 WIZ_RX_VON +!
+      WIZ_RX_VON @ SOCKET_RX_RECH LL 0010 SOCKET_VAR_RECH MM 2 WIZ_RX_VON +!
+      2 WIZ_RX_VON +!
+      END_IF
+    
+    ( WIZ nur auslesen
+    F400 WIZ_BUF !
+    WIZ_RX_VON @
+    BEGIN 
+      WIZ_RX_VON @ SOCKET_RX_RECH L WIZ_BUF @ C!
+      1 WIZ_RX_VON +! 1 WIZ_BUF +!
+      WIZ_RX_VON @ WIZ_RX_BIS @ = UNTIL
+    WIZ_RX_VON !
+    WIZ_RX_BIS @ 0028 SOCKET_VAR_RECH MM ( warum das nicht geht
+    40 0001 SOCKET_VAR_RECH M
+    
+    ( ab hier antworten
+    SOCKET_VAR_ADR @ 0 = IF MACRAWSEND ELSE
+      F400 WIZ_BUF @ F400 - 
+      ( CR 2DUP B.
+      ( CR 2DUP DUMP
+      CAP @ 1 AND IF CR 2DUP TYPE END_IF
+      SOCKET_VAR_ADR @ 100 = IF
+        WIZ_TYPE_INTERPRET ( nur hier WIZ_OPEN ... WIZ_SEND )
+        ELSE WIZ_TYPE_INTERPRET END_IF ( hier nochmal GET neu )
+      END_IF
+    
+    END_IF
+END_IF
+  ; HERE . BZEIG ? TLISTENZEIGER ?
+
+
+0 VARIABLE BREAK_BIT
+: WIZ_DISCONNECT
+  BREAK_BIT @ IF 
+    TLISTE TLISTENZEIGER ! 
+    ." Schluss mit EXXI "
+    QUIT
+    END_IF
+  0003 SOCKET_VAR_RECH L 13 = IF 02 0001 SOCKET_VAR_RECH M END_IF
+  0003 SOCKET_VAR_RECH L 1C = IF 10 0001 SOCKET_VAR_RECH M END_IF
+  0003 SOCKET_VAR_RECH L 00 = IF ESTABLISH END_IF
+  ;
+
+( 1771 VARIABLE UHRHANF ( vor DUMPZ unbedingt 7772 UHRHANF ! )
+: DAUERDINGS
+(   UHRH @ UHRHANF @ - 0< NOT IF
+(     UHRH @ 1 - UHRHANF !
+    SOCKET_VAR_ADR @ 100 + 700 AND SOCKET_VAR_ADR !
+    SOCKET_VAR_ADR @ 8 * DUP SOCKET_RX_ADR ! SOCKET_TX_ADR !
+    WIZ_RESPONSE
+    WIZ_DISCONNECT
+(     END_IF
+  ;
+
+
+STRG: ^B ." Angehalten für genau eine Eingabezeile: " CR HERE 100 EXPECT INTERPRET ." ok" ;
+STRG: ^D -1 BREAK_BIT ! ;
+
+
+
+
+
+( ############### den UFM aktivieren
+
+(*REM*)
+: W! ( b adr --> )
+  2D00 + SWAP 00FF AND 0700 + SWAP 2DUP ! 2DUP ! 0 SWAP ! DROP ;
+: W@ ( --> b )
+  0600 2D73 ! 0600 2D73 ! D030 @ 0000 2D73 !
+  ;
+: W? W@ LG. 20 EMIT ;
+( vorerst wieder alt:
+: W! ( b adr --> )
+  01 2C30 ! ( CLK=1
+  07 2D30 ! ( CYC=1, STB=1, WE=1
+  2D31 ! ( ADR=adr
+  2D32 ! ( DAT_O=b
+  00 2C30 ! ( CLK=0,
+  01 2C30 ! ( CLK=1,
+  00 2C30 ! ( CLK=0,
+  ( D030 ? ( da müsste nACK=0 sein, ha nach RST geht es auf einmal 
+  01 2C30 ! ( CLK=1
+  00 2D30 ! ( CYC=0, STB=0, WE=0
+  00 2C30 ! ( CLK=0,
+  ;
+  
+: W@ ( adr --> b )
+  01 2C30 ! ( CLK=1
+  06 2D30 ! ( CYC=1, STB=1, WE=0
+  73 2D31 ! ( ADR=adr
+  00 2C30 ! ( CLK=0,
+  01 2C30 ! ( CLK=1,
+  00 2C30 ! ( CLK=0,
+  D030 @ ( da müsste nACK=0 sein, ha nach RST geht es auf einmal 
+  01 2C30 ! ( CLK=1
+  00 2D30 ! ( CYC=0, STB=0, WE=0
+  00 2C30 ! ( CLK=0,
+  ;
+: W? W@ LG. 20 EMIT ;
+
+( geht noch nicht, rein intersserhalber
+: Y! ( b adr --> )
+  100 * SWAP 00FF AND + DUP DUP . DUP 2D61 ! 2D61 ! 2D60 ! ;
+: Y@ ( --> b )
+  7300 2D62 ! 7300 2D62 ! D030 @ 7300 2D60 !
+  ;
+: Y? Y@ LG. 20 EMIT ;
+( das aber geht neuerdings AB_90
+: W! ( b adr --> )
+  2D00 + SWAP 00FF AND 0700 + SWAP 2DUP ! 2DUP ! OVER 6FF AND SWAP ! DROP ;
+: W@ ( --> b )
+  0600 2D73 ! 0600 2D73 ! D030 @ 0000 2D73 !
+  ;
+: W? W@ LG. 20 EMIT ;
+(*END*)
+
+( und noch neuerdingser in Fortsetzung von Y!
+: W! ( b adr --> )
+  SWAP 100 * + 80 OR DUP 2D60 ! 2D60 ! 007F 2D60 ! ;
+: W@ ( --> b )
+  0073 2D60 ! 0073 2D60 ! D030 @ 007F 2D60 !
+  ;
+: W? W@ LG. 20 EMIT ;
+
+: DEVICE_ID
+  80 70 W! E0 71 W! 00 71 W! 00 71 W! 00 71 W! 
+  W? W? W? W?
+  00 70 W!
+  ;
+: TRACE_ID
+  80 70 W! 19 71 W! 00 71 W! 00 71 W! 00 71 W! 
+  W? W? W? W? W? W? W? W?
+  00 70 W!
+  ;
+: UFM_CHECK_BUSY_FLAG ( --> busyflag )
+  80 70 W! F0 71 W! 00 71 W! 00 71 W! 00 71 W! 
+  W@
+  00 70 W!
+  ;
+: RESET
+  CR
+  80 0 M ( RESET WIZ
+  80 70 W! 79 71 W! 00 71 W! 00 71 W! 00 70 W!
+  ;
+: UFM_BYPASS
+  80 70 W! FF 71 W! FF 71 W! FF 71 W! FF 71 W! 00 70 W!
+  ;
+: ENABLE_CONF
+  80 70 W! 74 71 W! 08 71 W! 00 71 W! 00 71 W! 00 70 W! ( 1 )
+  ;
+: RESET_UFM_ADRESS
+  80 70 W! 47 71 W! 00 71 W! 00 71 W! 00 71 W! 00 70 W! ( 3 ADR 0 )
+  ;
+: SET_ADRESS ( hb lb --> )
+  80 70 W! B4 71 W! 00 71 W! 00 71 W! 00 71 W! 
+  40 71 W! 00 71 W! SWAP 71 W! 71 W! 
+  00 70 W! ( 3 ADR 0 )
+  ;
+: DISABLE_CONF
+  80 70 W! 26 71 W! 00 71 W! 00 71 W! 00 70 W! ( 8 )
+  ;
+: ERASE_UFM
+  ENABLE_CONF
+  80 70 W! CB 71 W! 00 71 W! 00 71 W! 00 71 W! 00 70 W! ( 3 ADR 0 )
+  BEGIN UFM_CHECK_BUSY_FLAG ( DUP . ) 0= UNTIL
+  DISABLE_CONF
+  ;
+DEVICE_ID TRACE_ID 
+DEVICE_ID TRACE_ID 
+DEVICE_ID TRACE_ID 
+DEVICE_ID TRACE_ID 
+
+(*REM*)
+( S. 482/492 UFM Write Page 0
+: WRITE_PAGE_0
+  ENABLE_CONF
+  BEGIN UFM_CHECK_BUSY_FLAG DUP . 0= UNTIL
+  RESET_UFM_ADRESS
+  80 70 W! C9 71 W! 00 71 W! 00 71 W! 01 71 W! 
+  10 71 W! 11 71 W! 12 71 W! 13 71 W!
+  14 71 W! 15 71 W! 16 71 W! 17 71 W!
+  18 71 W! 19 71 W! 1A 71 W! 1B 71 W!
+  1C 71 W! 1D 71 W! 1E 71 W! 1F 71 W!
+  00 70 W!
+  BEGIN UFM_CHECK_BUSY_FLAG DUP . 0= UNTIL
+  DISABLE_CONF
+  UFM_BYPASS
+  ;
+
+( S. 483 UFB Read Page 0
+: READ_PAGE_0
+  ENABLE_CONF
+  BEGIN UFM_CHECK_BUSY_FLAG DUP . 0= UNTIL
+  RESET_UFM_ADRESS
+  80 70 W! CA 71 W! 00 71 W! 00 71 W! 01 71 W! 
+  W? W? W? W?
+  W? W? W? W?
+  W? W? W? W?
+  W? W? W? W?
+  00 70 W! ( 4 WRITE  )
+  BEGIN UFM_CHECK_BUSY_FLAG DUP . 0= UNTIL
+  DISABLE_CONF
+  UFM_BYPASS
+  ;
+(*END*)
+
+: SAVE_ONE_PAGE_OF_BYTES ( adr --> )
+  80 70 W! C9 71 W! 00 71 W! 00 71 W! 01 71 W!
+  10 0 DO DUP C@ 71 W! 1+ LOOP DROP
+  00 70 W!
+  BEGIN UFM_CHECK_BUSY_FLAG ( ." ." ) 0= UNTIL
+  ;
+: SAVE_ONE_PAGE_OF_WORDS ( adr --> )
+  80 70 W! C9 71 W! 00 71 W! 00 71 W! 01 71 W!
+  10 0 DO DUP C@ 71 W! DUP C@ 0 SWAP 100 U* DROP 71 W! 1+ LOOP DROP
+  00 70 W!
+  BEGIN UFM_CHECK_BUSY_FLAG ( ." ." ) 0= UNTIL
+  ;
+
+: SAVE
+  CR ." dauert 1 oder 3 sek "
+  WIZ_OPENBIT @ IF 
+    WIZ_SEND_SEND
+    0  WIZ_OPENBIT !
+    END_IF
+  RP0 @ RP !
+  ERASE_UFM
+  ENABLE_CONF
+  BEGIN UFM_CHECK_BUSY_FLAG 0= UNTIL
+  RESET_UFM_ADRESS
+   2000 0000 DO ( I . ) I SAVE_ONE_PAGE_OF_WORDS 8 +LOOP
+   2FC0 2C00 DO ( I . ) I SAVE_ONE_PAGE_OF_WORDS 8 +LOOP
+   F000 E000 DO ( I . ) I SAVE_ONE_PAGE_OF_BYTES 10 +LOOP
+  DISABLE_CONF
+  BEGIN UFM_CHECK_BUSY_FLAG 0= UNTIL
+  UFM_BYPASS
+  QUIT
+  ;
+
+
+: LOAD
+  ENABLE_CONF
+  BEGIN UFM_CHECK_BUSY_FLAG 0= UNTIL
+  RESET_UFM_ADRESS
+  80 70 W! 
+  CA 71 W! 10 71 W! 06 71 W! 79 71 W! ( 1+400+78+200=679
+   0 0010 0000 DO W@ OR LOOP 
+   IF
+     2000 0000 DO W@ W@ 100 * + I ! LOOP ( 400 pages ) 
+     2FC0 2C00 DO W@ W@ 100 * + I ! LOOP ( 78 )
+     F000 E000 DO W@ I ! LOOP ( 200 )
+     ELSE ." nix geladen weil Speicher leer" END_IF 
+  00 70 W!
+  DISABLE_CONF
+  UFM_BYPASS
+  QUIT
+  ;
+
+: TESTLOAD
+  ENABLE_CONF
+  BEGIN UFM_CHECK_BUSY_FLAG 0= UNTIL
+  RESET_UFM_ADRESS
+  80 70 W! 
+  CA 71 W! 10 71 W! 00 71 W! 04 71 W! ( 1+3
+  0020 0000 DO W@ W@ 100 * + . LOOP 
+  00 70 W!
+  DISABLE_CONF
+  UFM_BYPASS
+  ;
+
+
+
+( ERASE_UFM
+( SAVE
+( READ_PAGE_0
+
+( LOAD ( vorsichtig machen
+
+
+DEVICE_ID TRACE_ID 
+
+
+( ############# fertig mit UFM
+
+
+
+( RST1 ( mit warten etwas
+( RST2
+( ESTABLISH  
+
+( 402A L. 402B L.
+( 4028 L. 4029 L.
+( 4024 L. 4025 L.
+( 4022 L. 4023 L.
+
+( " 77 88 * ." WIZ_TYPE_INTERPRET
+
+( ###############################
+( ---erster Versuch Kanal 80
+
+
+: HTTP/1.1_200    ." HTTP/1.1 200 OK" ;
+: SERVER     CRNL ." Server: MACHXO2/00:08:DC:94:4A:ED" ;
+: CONTENTTYP CRNL ." Content-Type: " ;
+: CHARSET         ." ; charset=UTF-8" ;
+: CHUNKED    CRNL ." Transfer-Encoding: chunked" ;
+
+
+: .xml ." text/xml" ;
+
+
+0 VARIABLE FILELAENGE
+: FILE
+  0 FILELAENGE !
+  ERASE_UFM
+  ENABLE_CONF
+  BEGIN UFM_CHECK_BUSY_FLAG 0= UNTIL
+  0 1 SET_ADRESS ( war erst RESET_UFM_ADRESS
+  BEGIN QUERY 2DUP " END_FILE" Z= NOT WHILE
+    2DUP + 0A SWAP C! 1+
+    0 DO
+      FILELAENGE @ 000F AND 0= IF
+        00 70 W!
+        BEGIN UFM_CHECK_BUSY_FLAG 0= UNTIL
+        80 70 W! C9 71 W! 00 71 W! 00 71 W! 01 71 W!
+        END_IF
+      DUP C@ 71 W! 1+ 1 FILELAENGE +!
+      LOOP
+    DROP
+    REPEAT
+  2DROP
+  FILELAENGE @ 000F AND BEGIN
+    DUP 000F AND 0= NOT WHILE
+      20 71 W! 20 .
+      1+ REPEAT ( letzte unvollstaendige page auch gar fuellen
+  DROP
+  00 70 W!    
+  BEGIN UFM_CHECK_BUSY_FLAG 0= UNTIL
+
+  ( FILELAENGE noch speichern
+  RESET_UFM_ADRESS
+  80 70 W! C9 71 W! 00 71 W! 00 71 W! 01 71 W!
+  FILELAENGE @ 00FF AND 71 W! 
+  FILELAENGE @ 100 / 71 W! 
+  0E 0 DO 0 71 W! LOOP
+  00 70 W!    
+  BEGIN UFM_CHECK_BUSY_FLAG 0= UNTIL
+  DISABLE_CONF
+  BEGIN UFM_CHECK_BUSY_FLAG 0= UNTIL
+  UFM_BYPASS
+  ;
+
+: FILETYPE
+  ENABLE_CONF
+  BEGIN UFM_CHECK_BUSY_FLAG 0= UNTIL
+  RESET_UFM_ADRESS
+  80 70 W! CA 71 W! 10 71 W! 00 71 W! 00 71 W! ( 1
+  W@ W@ 100 * + FILELAENGE !
+  00 70 W!
+  BEGIN UFM_CHECK_BUSY_FLAG 0= UNTIL
+  
+  0 1 SET_ADRESS ( war erst RESET_UFM_ADRESS
+  80 70 W! 
+  CA 71 W! 10 71 W! 
+  FILELAENGE @ 20 + 100 / 71 W! 
+  FILELAENGE @ 20 + 10 / 00FF AND 71 W! ( 1+x
+  10 0000 DO W@ DROP LOOP 
+  FILELAENGE @ 1 - 0000 DO ( 1 - wegen "§"
+    W@ 
+    DUP C2 ( "§" ) = IF DROP W@ DROP ARQ ELSE EMIT END_IF
+    LOOP 
+  00 70 W!
+  DISABLE_CONF
+  UFM_BYPASS
+  ;
+
+(*REM*)
+( Variante ab BZEIG
+0 VARIABLE FILESTART
+0 VARIABLE FILELAENGE
+: FILE
+  BZEIG @ FILESTART !
+  0 FILELAENGE !
+  BEGIN QUERY 2DUP " END_FILE" Z= NOT WHILE
+    0 DO
+      DUP C@ BZEIG @ C! 1 BZEIG +! 1+ 1 FILELAENGE +!
+      LOOP
+    DROP
+    CR 0A BZEIG @ C! 1 BZEIG +! 1 FILELAENGE +!
+    REPEAT
+  2DROP
+  ;
+
+FILE
+<DOCTYPE html> 
+<meta charset="utf-8" /> 
+<style type="text/css"> 
+body {  font-size:150%; border:solid; }
+button { font-size:200%; background-color:pink; border:dotted; }
+div { white-space:pre-wrap; font-family:Courier,monospace; }
+</style> 
+<script language="javascript" type="text/javascript">  
+var output;
+----
+END_FILE
+FILELAENGE ?
+
+
+FILETYPE
+
+
+: GETFILE ( adr n --> )
+    2DROP
+  HTTP/1.1_200
+  SERVER
+  CONTENTTYP .xml
+  CHARSET
+  CHUNKED
+  CRNL CRNL 
+    ( 0188 HG. 
+    ( 019E HG.
+    01B9 HG.
+    CRNL 
+    TX_ADDR @ TX_ADDR_MERK !
+." <?xml version='1.0' encoding='utf-8' ?>"
+." <!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"
+." <html xmlns='http://www.w3.org/1999/xhtml'>"
+." <head>"
+."  <title>MACHXO2</title>"
+." </head>"
+." <body style='font-size:300%'>"
+." <p>Hier ist MACHXO2 mit WIZ820IO</p>"
+( 0 WIZ_OPENBIT !
+(  QUERY 2DROP
+( 1 WIZ_OPENBIT !
+( TYPE
+." <p>Die Lichter sind "
+2D04 @ IF ." an </p>" ELSE ." aus</p>" END_IF
+." <ul><li><p><a href='AN' >alle Lichter einschalten</a></p></li>"
+." <li><p><a href='AUS'>alle Lichter ausschalten</a></p></li>"
+." <li><p><a href='AN0'>LED 0 einschalten</a></p></li>"
+." <li><p><a href='AUS0'>LED 0 ausschalten</a></p></li></ul>"
+." <p>usw.</p>"
+." </body>"
+." </html>"
+
+(    NADDR @ DUP NADDRMERK @ - NADDRMERK @ EXTRA_NNG. NADDR !
+    TX_ADDR @ DUP TX_ADDR_MERK @ - 
+    TX_ADDR_MERK @ 6 - TX_ADDR ! 
+    HG.
+    TX_ADDR !
+    
+    CRNL 30 EMIT ( ." .0" )
+    CRNL CRNL
+  ; HERE . BZEIG ?
+  
+
+(*END*)
+
+: GETFILE ( adr n --> )
+    2DROP
+  HTTP/1.1_200
+  SERVER
+  CONTENTTYP .xml
+  CHARSET
+  CHUNKED
+  CRNL CRNL 
+    ( 0188 HG. 
+    ( 019E HG.
+    01B9 HG.
+    CRNL 
+    TX_ADDR @ TX_ADDR_MERK !
+    FILETYPE
+(    FILESTART @ FILELAENGE @ TYPE
+(    NADDR @ DUP NADDRMERK @ - NADDRMERK @ EXTRA_NNG. NADDR !
+    TX_ADDR @ DUP TX_ADDR_MERK @ - 
+    TX_ADDR_MERK @ 6 - TX_ADDR ! 
+    HG.
+    TX_ADDR !
+    
+    CRNL 30 EMIT ( ." .0" )
+    CRNL CRNL
+  ; HERE . BZEIG ?
+
+: GET
+  20 WORD 
+  2DUP " /AN" Z= IF -1 2D04 ! END_IF
+  2DUP " /AUS" Z= IF 0 2D04 ! END_IF
+  2DUP " /AN0" Z= IF 2D04 @ 0001 OR 2D04 ! END_IF
+  2DUP " /AUS0" Z= IF 2D04 @ 00FE AND 2D04 ! END_IF
+  2DROP
+  0 WORD GETFILE
+  ;
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+( ############# gleich TON hinterher
+: EINSCHALTZEIT_ABWARTEN2 ( ebit tconst uhraddr --> abit tout )
+  ROT IF 
+    2DUP @ UHRH @ ROT - - 0< IF 
+      UHRH @ ROT DUP >R 1 + - SWAP ! 1 R> 
+      ELSE @ UHRH @ SWAP - 0 ROT DROP SWAP END_IF    
+    ELSE UHRH @ SWAP ! DROP 0 0 END_IF
+  ;
+
+IMMEDIATE: TON ( IN PT --> Q ET ) 
+  RAMP1 @ DUP . , 1 RAMP1 +! COMPILE EINSCHALTZEIT_ABWARTEN2 ;
+
+( ############# das war's auch schon mit TON
+
+(*REM*)
+( die aktuelle PROBIERPLATINE:
+ENTFERNE PROBIERPLATINE
+: PROBIERPLATINE
+  1400 @ 2C20 !
+  1400 @ 7A TON DROP 2C21 !
+  1400 @ 4C4 TON DROP 2C22 !
+  1400 @ 988 TON DROP 2C23 !
+  1400 @ 1310 TON DROP 2C24 !
+  ;
+BEFESTIGE PROBIERPLATINE
+
+ENTFERNE TESTSIGNAL
+: TESTSIGNAL
+  UHR @ 0020 AND IF 1 ELSE 0 END_IF 1400 ! 
+  ;
+BEFESTIGE TESTSIGNAL
+UHR ? 1400 ?
+
+UHR ? D00C ?
+
+(*END*)
+
+
+
+( P P P P P P P P ====== erste PID-Variablen P P P P P P P P )
+
+FFFF 2D18 ! ( XAMP
+0019 2D1A ! ( PW_FREQUENZ
+
+2C1D CONSTANT DREIPHASENBIT -1 2C1D !
+2D17 CONSTANT INV_FINTI 0 2D17 ! ( gaengig 80 INV_FINTI !
+2D18 CONSTANT AMP1 FFFF 2D18 !
+2D2F CONSTANT FPROP 1000 2D2F !
+D014 CONSTANT POSDET1 ( IST_X
+D018 CONSTANT SOLLWERT1
+
+( : SOLLPOSNULL
+(   BEGIN SOLLWERT1 2@ OR WHILE 1 2C03 ! NOOP NOOP 0 2C03 ! REPEAT
+(   ;
+( SOLLWERT1 2? SOLLPOSNULL SOLLWERT1 2?
+( 1 2C03 ! 0 2C03 ! SOLLWERT1 2? D01A ? D016 ?
+( 1 2C02 ! 0 2C02 ! SOLLWERT1 2? D01A ? D016 ?
+( D01A ? D016 ?
+( FPROP @ 1+ FPROP ! FPROP ? D01A ? D016 ?
+( 1 2C00 ! 1 2C01 ! 0 2C00 ! 0 2C01 ! D014 2? SOLLWERT1 2?
+( 1 2C01 ! 1 2C00 ! 0 2C01 ! 0 2C00 ! D014 2? SOLLWERT1 2?
+  
+( anstelle von ANTRIEB jetzt externes Weiterstellen
+: KOMP ( f --> )
+  IF
+    4 0 DO 1 2C02 ! 1 0 DO LOOP 0 2C02 ! 1 0 DO LOOP LOOP
+    ( SOLLWERT1 2? D01A ? D016 ?
+    1 2C00 ! 1 0 DO LOOP 1 2C01 ! 1 0 DO LOOP 
+    0 2C00 ! 1 0 DO LOOP 0 2C01 ! 
+    ( D014 2?
+    END_IF
+  ;
+
+( vorerst nur Probiervariablen
+0 VARIABLE LICHTBIT
+0 VARIABLE FINT
+2C1C CONSTANT PAUSENBIT 0 PAUSENBIT !
+: LICHT LICHTBIT @ NOT LICHTBIT ! ;
+: PAUSE PAUSENBIT @ NOT PAUSENBIT ! ;
+: NOTAUS ;
+0 VARIABLE DREIPHASENBITY
+0 VARIABLE FES
+0 VARIABLE VANF
+: POSNULL ;
+
+
+38 RAMBUF PORTBUF
+: PORTSCA ( n --> )
+  BEGIN D10F @ UNTIL
+  BEGIN D10F @ 0= UNTIL
+  BEGIN -1 + D005 @ OVER PORTBUF + ! NOOP NOOP DUP 0= UNTIL DROP 
+  ;
+: PORTSCATY ( b n --> )
+  BEGIN 
+    -1 + 2DUP PORTBUF + @ AND IF 
+      31 ELSE 30 END_IF 
+    EMIT 
+    DUP 0= UNTIL 
+  2DROP
+  ;
+
+: ARQ  
+     ." <LESEDATEN>"
+  CR ."   <TAKT>" UHRL 2 + @ HG. UHRL 2@ SWAP HG. HG. ." </TAKT> "
+  CR ."   <INPUT>" D013 @ HG. D012 @ HG. ." </INPUT>"
+  CR ."   <OUTPUT>" D011 @ LG. D010 @ HG. ." </OUTPUT>"
+  CR ."   <LICHTBIT>" LICHTBIT @ 1 AND 30 + EMIT ." </LICHTBIT> "
+  CR ."   <PAUSENBIT>" PAUSENBIT @ 1 AND 30 + EMIT ." </PAUSENBIT> "
+  CR ."   <PIXELDECODER>"
+  CR ."     <IST_X>" POSDET1 2@ SWAP HG. HG. ." </IST_X> "
+  CR ."     <SOLL_X>" SOLLWERT1 2@ SWAP HG. HG. ." </SOLL_X> "
+  CR ."     <SOLL_V>" D02C @ HG. ." </SOLL_V> "
+  CR ."     <STIFT>" D10E @ HG. ." </STIFT> "
+  CR ."     <VANF>" 2D2E @ HG. ." </VANF> "
+  CR ."     <VMAX>" 2D2C @ HG. ." </VMAX> "
+(  CR ."     <VMAX2>" 2D2A @ HG. ." </VMAX2> "
+  CR ."     <BESCHL>" 2D2D @ HG. ." </BESCHL> "
+  CR ."     </PIXELDECODER> " 
+  CR ."   <PWM>"
+  CR ."     <PW_FREQUENZ>" 2D1A @ HG. ." </PW_FREQUENZ> "
+  CR ."     <DREIPHASENBIT_X>" DREIPHASENBIT @ HG. ." </DREIPHASENBIT_X> "
+  CR ."     <AMP_X>" 2D18 @ HG. ." </AMP_X> "
+(  CR ."     <DREIPHASENBIT_Y>" DREIPHASENBITY @ HG. ." </DREIPHASENBIT_Y> "
+(  CR ."     <AMP_Y>" 2D19 @ HG. ." </AMP_Y> "
+  CR ."     </PWM> "
+  CR ."   <PORT>" 38 PORTSCA 
+  CR ."     <PWM1H>" 1 38 PORTSCATY ." </PWM1H>"
+  CR ."     <PWM1L>" 2 38 PORTSCATY ." </PWM1L>"
+  CR ."     <PWM2H>" 4 38 PORTSCATY ." </PWM2H>"
+  CR ."     <PWM2L>" 8 38 PORTSCATY ." </PWM2L>"
+  CR ."     <PWM3H>" 10 38 PORTSCATY ." </PWM3H>"
+  CR ."     <PWM3L>" 20 38 PORTSCATY ." </PWM3L>"
+  CR ."     </PORT>"
+  CR ."   </LESEDATEN>"
+  ; HERE . BZEIG ?
+
+
+( X X X X X X X X  =====   W E B S O C K E T  ====   X X X X X X X )
+
+(*REM*)
+: H1
+  WEBSOCKETVAR @ SOCKET_VAR_ADR !
+  SOCKET_VAR_ADR @ 8 * DUP SOCKET_RX_ADR ! SOCKET_TX_ADR !
+  WIZ_SEND_OPEN
+  81 EMIT 0 WORD DUP EMIT TYPE
+  WIZ_SEND_SEND
+  ;
+
+: H2
+  WEBSOCKETVAR @ SOCKET_VAR_ADR !
+  SOCKET_VAR_ADR @ 8 * DUP SOCKET_RX_ADR ! SOCKET_TX_ADR !
+  WIZ_SEND_OPEN
+  81 EMIT 
+  " <LESEDATEN><TAKT>0003551CEDF7</TAKT> <PIXELDECODER><SOLL_X>00000000</SOLL_X> </PIXELDECODER> </LESEDATEN>"
+  DUP EMIT TYPE
+  WIZ_SEND_SEND
+  ;
+(*END*)
+
+
+0 VARIABLE UHRM
+4 VARIABLE TBIT
+
+: WARQ
+  WIZ_SEND_OPEN
+  (  81 EMIT 7E EMIT 03 EMIT 2F EMIT ARQ
+  ( 81 EMIT 69 EMIT ARQ
+  81 EMIT 7E EMIT 
+  01 EMIT 64 EMIT TX_ADDR @ TX_ADDR_MERK ! 
+  ARQ
+  TX_ADDR @ TX_ADDR_MERK @ 
+  2DUP - SWAP 2 - TX_ADDR ! 
+  CAP @ >R 0 CAP ! 0 OVER 100 U* DROP EMIT EMIT R> CAP !
+  TX_ADDR !
+  WIZ_SEND_SEND
+  ;
+
+
+
+
+
+
+
+: START 
+  UHRH @ 7A 01 * + ( bis dahin warten für RESET WIZ
+  ( jetzt über PULLUP/DOWN: 0 2C08 ! 0 2C0B ! ( nSS und nRESET von WIZ als erstes setzen!!! ) 
+  0 BEGIN 1 + DUP 2D04 ! DUP 100 = UNTIL DROP ( flacker für Anfangstest )
+  BEGIN KEYCODE2 SWAP DROP 0= UNTIL ( warten bis RxD stabil 1 ) 
+  ." FORTY-FORTH"
+  BEGIN DUP UHRH @ - 0< UNTIL DROP ( bis 1*150 ms auf WIZ warten nach RST, 7A=53200000/2^16*0,15
+  0 BEGIN 1 + DUP 2D04 ! DUP 100 = UNTIL DROP ( nochmal flacker für WIZ ein )
+  1 2C08 ! ( WIZ chipselect
+  ( 80 0 M ( WIZ INIT - lieber nicht, da geht nämlich gar nix
+  ( DO LOOP geht hier noch nicht
+  2C00 BEGIN DUP @ OVER ! 1+ DUP 2D00 = UNTIL
+  2D04 BEGIN DUP @ OVER ! 1+ DUP 2D80 = UNTIL
+  CR CR QUIT ; ( und los gehts )
+
+( WIZ nochmal starten 
+TLISTE TLISTENZEIGER !
+80 0 M 0 100 DUMP
+0 BREAK_BIT !
+
+BEFESTIGE DAUERDINGS
+
+( BEFESTIGE WLICHT
+( ESTADUMP
+
+( zum tunen:
+( REPLACE: WIZ_RESPONSE WIZ_RESPONSE2 ;
+( REPLACE: WIZ_TYPE_INTERPRET WIZ_TYPE_INTERPRET2 ;
+( 1 2C2C !
+
+
+( DEVICE_ID TRACE_ID 
+( ' START 4000 + DUP . 0 ! 8FFE 1 !
+( HERE 0000 DUMPL 
+( BZEIG @ E000 DUMPB
+( 3000 2C00 DUMPL
+
+0 CRBIT !
+8000 14 ! ( kein INT )
+HERE 2000 HERE - 0 FILL
+BZEIG @ FB00 BZEIG @ - 0 FILL
+DEVICE_ID TRACE_ID 
+HERE . BZEIG ?
+( HERE 0000 DUMPL CR ." DUMP" BZEIG @ E000 DUMPB CR ." DUMP" CR 3000 2C00 DUMPL
+CR ." ( " HERE . ." DP ! " BZEIG ? ." BZEIG ! " LFA ? ." LFA ! " RAMP1 ? ." RAMP1 ! " RAMP3 ? ." RAMP3 ! " CR
+

@@ -1,0 +1,321 @@
+... bis hier siehe AB_90 
+ABWAERTS_93
+  ok ist wieder in Gang  
+  ok WIZ_nINT und WIZ_nRST ist raus, WIZ_PWD muss vorerst bleiben wegen =0
+  ok gezipt und geboxt, nix geht schief.
+  ok BREAK_BIT IF vor ESTABLISH damit ^D überhaupt gehen kann
+  .. Hoii jetzt ist TOP.sch mal gegangen. Folgender Ablauf bis dahin
+     _93 anlegen
+     -Platine01.sym generieren, geht in MACHXO2
+     -Platine01.sym mit kopieren in source addieren
+     -TOP.sch mit dem source/Platine01.sym zeichnen.
+     !!!aaaha, nach IPExpress ist wieder .sch ERROR Code 1
+     -nee doch nicht:oha, da muss auch source/UFM.vhd addiert werden!!!
+     -jetzt geht wieder alles wie in _94
+     ---also so hab ich es wieder in Gang gebracht
+     -gleiches ABWAERTS_93 nochmal neu
+     -Diamond 1x ausschalten
+     -IPExpress starten war nicht nötig, RAM und UFM gehen auch so
+     ----jetzt wieder UFM geht nicht und .sch ERROR 1 nach IPExpress UFM
+     -- der ERROR1 geht weg nach Neustart Diamond
+     -- UFM geht nach addieren source/UFM.vhd und nochmal IPExpress UFM
+     HUUU wieder ging viel nix
+     jetzt hab ich alle WIZ_ wieder dran
+     UFM geht immer noch nicht---ABWAERTS_94 reaktiviert, das geht
+     ---gleich in ABWAERTS_92 hinein!!! oder ABWAERTS_93 nochmal neu füllen
+  ok mit der alten Version _94BAK.jed habe ich SAVE LOAD fertig
+  .. wie aber UFM wieder in Gang bringen???
+  .. 2C2C wieder 0
+  .. 150 ms setze ich auf 300 ms rauf, sogar 600 jetzt
+     beim UFM immer wieder IPExpress nochmal aufrufen
+     wenn in UFM 1 geschrieben, geht 0 schreiben nicht --> ERASE_UFM mit rein
+  ok ERASE UFM ist mit in SAVE drin
+  .. Socket 0 aus _95 noch hinzutun
+  .. VHDL-Version
+  ok SAVE LOAD, ist das schon soweit???
+  .. IN TON noch STAT=0 einbauen
+  nö TON umdingsen auf TON <objekt>, das dürfte die gewohnte Version wie WORD: sein
+
+na sowas, jetzt hab ich alle INPUT,OUTPUT stillgelegt, da geht UFM, aber nicht WIZ
+und jetzt INPUT,OUTPUT wieder hinzu da geht UFM auch noch!!!
+---> gleich weiter in ABWAERTS_92!!!
+
+AB_92:
+gibt's einfach nicht, UFM geht. Was das blos war.---Pause!!!
+so nun nochmal UFM in DUMPZ03.txt hineinkompilieren als RESET Ausgangsstellung
+
+UFM ging eine Weile, aber nach neuem RAM-File geht wieder nicht
+DEVICE_ID TRACE_ID  00 00 00 00 FF FF FF FF FF FF FF FF ok
+was das blos ist. Hab jetzt alle anderen IO ausgeschaltet, hilft nicht.
+
+Jetzt hab ich wieder das langsame W! W@ rein, da geht alles bestens!
+Huuuu, das war heute knapp aber geschafft LOAD SAVE RESET sind drin.
+
+Hinzuschalten von .sch geht mit Löschen .v und Neustart Diamond
+
+  .. vor LOAD nochmal schauen ob überhaupt gefüllt
+
+Jetzt ging nochmal WIZ nicht nach Aus/Ein. nach allen möglichen Abklemmen 
+bin ich von 300 msauf 600 ms nauf, jetzt wieder alles ok auch .sch mit
+und TON mit hineinkompiliert. Das hebe ich aber auf --> weiter zu
+
+AB_91: Also was alles noch holpert:
+  ok bei .sch ERROR 1 erst TOP.v löschen dann Diamond neu starten
+  ok das LOC File füllen
+  ok Toplevel setzen nicht vergessen!!!
+  ok wenn dann WIZ noch nicht geht, nochmal Toplevel Platine01 rechnen
+  ok unmittelbar danach ohne was zu ändern ging auch Toplevel TOP
+  ok aaaaha, das WIZ nicht mehr geht, könnte auch mit LOAD zusammenhängen
+    jawohl, so war es auch, WIZ_nRST war in .sch nicht mit angeschlossen
+    und so wurde 2C4A auf diesen Pin gelegtl, was bei LOAD den WIZ reettet.
+  ok bei ERROR 1 genügt momentan Diamond neu starten, evenso wenn .sym generieren nicht geht
+  ok WIZ_nINT und so mal in .sch abgeschaltet, geht.
+
+  90 PULLUP wieder auf PULLDOWN machen
+  nö also in START muss wieder mit rein 
+        80 0 M damit mit neuladen auch der WIZ rückgesetzt wird
+        ojeh was ich mir damit wieder eingehaldelt habe
+        raus damit und es ist alles wieder ok
+        ." .. initialisiere WIZ " sieht besser aus bei RESET
+        brauch ich aber auch nicht bei 150 ms
+        also auch wieder raus
+  90 die Ausgabeformatbits dann auch mal mit
+       keine Antwort, kein ok, keine Nullantwort
+  90 START geht aber nur ab UHR=0
+  90 wäre gut, wenn LOAD auch so schnell geht, wäre ja drin.
+  ok die Schleifen in ESTABLISH auch mal versuchshalber raus
+     na wenigstens das geht. 
+  ok MACRAW+UDP+TCP sind jetzt zusammengefasst
+  --> ist gut so, aufheb
+
+AB_90
+  ok geht, hab mit Platine01 losgerechnet und ging auf Anhieb
+  ok PULLDOWN ist auch drin, genug für heut!!!
+  ok also LOAD mit mehreren pages laden ist soweit ok
+     da muss ich tatsächlich die zweite Variante CA 10 verwenden
+  ok LOAD (hoffentlich) nicht wenn leer
+  ok RESET das ok weg, von netcat aus probier, 
+  ok START geht aber nur ab UHR=0, nee jetzt immer ok
+  ok compiliert mit 1701 2014 1039, Pause
+  ok LOAD so schnell wie geht, SAVE darf dauern.
+     hab das schnellere W! W@, war WB-Fehler gewesen
+     außerdem dann wo schon fertig CYC=1 dauerhaft gesetzt
+     bis ich das wieder gefunden habe huuuu Schluss jetzt
+  ok waum X@ nicht geht, liegt möglicherweise daran, 
+      dass clk deutlicher vor stb gesetzt werden muss
+      also nicht clk nach hinten verschieben, sondern die anderen
+      ok daran lag es nicht sondern an 2D61 statt richtig 2D63
+      aber auch das nach hinten verchieben ist richtig und geht
+      damit ist jetzt W! W@ perfekt fertig!!!! 1801 2014 0846 Pause
+  ok LOAD geht noch nicht von netcat aus
+     geht doch, statdessen nach SAVE von netcat aus 
+     geht LOAD auch in FF nicht, also SAVE muss noch geändert werden
+     also nochmal genau überleg...
+  ok in EXXI jetzt kein STAT=0 mehr setzen wegen : H über netcat
+  ok statt 0 IF das PROTOKOLL abfragen
+  .. zusätzliche PULLUP und PULLDOWN mal ganz weglassen ok kein Problem
+     huuu kurzer Schreck, scheint doch nicht immer zu gehen, also nochmal
+     aber vorher lieber AB_89 und aus.
+
+AB_89
+  ok läuft
+  ok mal P21 probier nur mal so interesserhalber? geht problemlos 37%->41%
+  ok P31 PID komplett geladen -->99% und ging, nur ttyUSB weng wacklig+
+     dann aber nur PIDX--> 61%
+     nur 2 .vhd Korrekturen:
+       ERRN32:=... ERRN:=ERRN32(15 downto );
+       V64:=...V:=V64(47 downto 0);
+     dann ging alles zu compilieren und FF läuft auch.
+  ok oho die Adressverteilung passt ja schon so gut wie ganz. Gute Nacht
+  ok hab heute mühsamst wirklich Schritt für Schritt die PWM-Lämpchen an
+     im wesentlichen vier Fehler:
+     - wieder synchrone übergabe 2C00->POS_A machen
+     - nichtinitialisierte Signale werden '1' gesetzt???
+     - paar ERRN noch nicht auf ERRN32 umgeschrieben
+     - den INV_FINT Teil vollständig auskommentiert
+     dann gingen die Lämpchen einwandfrei, also ab Sintab war alles gleich ok
+  ok die Lichter mal anbringen. ok ist damit erfolgt
+  ok Gute Nacht, morgen vielleicht besser mitz AB_88 weitermach.
+
+AB_88
+  ok .lpf/01.sym/TOP/
+  ok WEBSOC mit externer Eingabe, die geht einfach nicht. ok endlich da 
+  ok WEBSOCK ist komplett lauffähig
+     Fehler waren 
+     - EXXI ausschalten
+     - WEBSOCKVAR setzen
+     - CLOSE aus .htm rausmach
+     aber ok, das kann jetzt gefüllt werden. 
+     war nicht übermäßig heut, aber ok
+  ok die stringente Fortsetzung ist dann AJAX umschließen
+  ok wenn TABLET aus ist ob da WIZ wartet (Buflen lesen) ok 
+     sendet einfach weiter, aber Tablet bleibt dran!!
+  ok 1x compiliert und WEBSOCKET geht!!! suuuuper!!!
+  ok Feierabend!!!
+  ok also PORTSCA ist noch recht wackelig, da stimmt 1ms nicht??? ok
+  ok heut nur PORTSCATYPE, wirklich von 0 auf, 000111 ist jetzt aufm Tablet
+  ok das langt für heut,
+  ok noch weng formatiert (white-space:pre) und jetzt wirklich Schluss
+  ok also AJAX geht definitif nicht und deshalb keine Automatik darüber
+  ok huuuu neues .jed läuft mit PORTSCA drin!!! 
+  ok so das reicht für heut, aus das Ding!!!
+  ok also los als erstes gleich mit 28 -> 32 oder gleich 38, um die Ecke zu sehen.
+  ok dann die automatische Antwortlänge machen, ist doch schonmal drin, sogar 2mal
+  ok dann 28F wieder auf 51E raufsetzen
+  ok hab jetzt 1A ARQ, direkt mal mit herschreib:
+<LESEDATEN>
+  <TAKT>001C23DDCCED</TAKT>
+  <PIXELDECODER>
+    <SOLL_X>00002187</SOLL_X>
+    </PIXELDECODER>
+  <PWM>6
+    <PWM1H>01111111111111111111111111111111111111110000000000011111</PWM1H>
+    <PWM1L>00000000000000000000000000000000000000000111111111000000</PWM1L>
+    <PWM2H>01111111111111111111111111111111111000000000000000011111</PWM2H>
+    <PWM2L>00000000000000000000000000000000000011111111111111000000</PWM2L>
+    <PWM3H>00000000000000000000000000000000000000000000000000000000</PWM3H>
+    <PWM3L>11111111111111111111111111111111111111111111111111111111</PWM3L>
+    </PWM>
+  </LESEDATEN>ok
+  und aus.
+  ok Mensch, wieder x-Compilier bis ich das DO LOOP raus aus Start habe
+  ok und BEGIN ... UNTIL mit DUP drin!!! und nicht ohne. 2h
+  ok aber läuft prima vom Start weg!!! 
+  ok momentan geht bei PORTSCAN CLK auf 3 MHz auch bei 2C2C=1
+  ok jupp ich hab die Super-Lösung: CLK_I von P10 verwenden! Innerhalb gehnt nicht!!!
+  ok die Scandauer ist gerade 50*1 mys.
+  ok wieder die Anfangswerte setzen in START.Muss ich machen wegen SAVE LOAD 
+  ok dabei folgendes: Nach dem Einschalten die PULLUP/DOWN, nach 150 ms 2C00-2D80
+  ok ein KURZLOAD, um mal einen Blick draufzuwerfen.
+  ok toll, 14*ok morgen dann 
+  
+AB_87
+  ok dass P31 auf einmal bis 88% geht muss ich auch mal schauen wieso
+     ok da ist wohl nix zu machen, kleckert sich zusammen...
+  o. es bleibt aber immer mal wieder nach längerer Zeit stecken
+     also bei WEBSOCKETVAR=0 läuft's gut, nee jetzt hab ich einen Anhalt
+     jetzige Vermutung: wenn alle Sockets voll sind.-ja dann geht wirklich 
+     kein weiteres GET, aber FF geht noch... also doch mal nur 2 Sockets
+     laufen lassen oder zwischendurch maL 80 0 M...
+     Jetzt schon mal nach 60 min Halt, weiß einfach nicht warum
+     Danach neu laden geht problemlos, also an USB liegt es nicht.
+     Es muss mit dem WIZ zusammenhängen, weil auch ^F nicht geht.
+     Die Lämpchen haben vorhin 05stark/07schwächer geleuchtet, aber erst noch mal
+     schauen, wie sie normal leuchten. ja, da leuchtet 77 wie es sein soll
+     damit ist 05stark/07schwächer doch ein Fingerzeig.
+     mit voller Ausgabe 2D04 und DUP . und ESTADUMP und ARQ
+     haT sich eine ganze Woche lang kein Fehler blicken lassen
+     dann gings gleich nicht weil Stecker gezogen.. nur unbrauchbares
+     also mal nur in DAUERDINGS 2D04 und DUP . ...
+     ja da habe ich jetzt einen Fehlerkreis:
+     0033 0037 0041 0043 0047 0051 0053 0057 0061 0063 0067 
+     0071 0073 0077 0001 und dann fest
+     im Moment versuche ich es mit TX_ADDR=0000 ganz ausschließen...
+     
+  ok zwischenrein mal wieder RAMB compiliert-ging erst nach mehreren Versuchen!!! huuu
+  .. FINT mal probieren...
+  .. ich mach mal das SHA1 nicht mehr mit QUERY sondern TYPE und extra zurücksenden
+  ok wichtig das Websocket close noch rein.
+  .. RAMP2 für E000 bis FFFF
+  .. Zwischensend
+  .. Ausgabeformatbits
+  
+AB-86
+  ok jetzt mit git
+  ok websocket.send() mit XOR=( a and not b) or (b and not a)
+  ok bei websocket.close auch WIZclose machen.
+  ok ARQ nur nach WEBSOCKET_MESSAGE, gut, damit gehen mehrere ARQ
+     und WEBSOCKETVAR kann wieder raus...ok geht super
+  ok DAUERDINGS verzögert starten und P16 INPUT ohne _P
+     das war notwendig weil sonst FF nicht startet!!!
+     aber _P wieder hinzu geht jetzt auch!!! ok das ist gut!!!
+  ok Websocket läuft nur von 17:51 bis vor 18:00, 18:19:xx bis 18:28:45
+     mal schauen ob es an fehlender PING-Antwort liegt, 
+     nee, daran liegt es nicht, also kammer nix machen 
+  .. gann eben weiter mit DREIPHASENBIT und FINT 
+     und Button STELLWERT+1 und S N MOT-Ausgabe.
+     So, im Moment kommt nur STELLWERT=0 an.
+     momentan auch immenr DEBUG=7FFF
+     ok DREIPHASENBIT geht jetzt, hatte nur FPROP=3 statt FPROP=300 gesetzt!!!
+        und das den ganzen Abend gesucht!!!  
+     ok also heut vorm. folgendes alles:
+        STELLWERT<0 war noch nicht angeschlossen
+        die M-Randbeschriftung skaliert jetzt
+        und ist auch richtig angeordnet.
+        WEBSOCKET.htm in .xml umbenannt
+     ok auch M-Innen dreht sich jetzt mit
+     ok ha, Websocket 8 min, das muss am : ANTRIEB liegen, weils wieder angeht!!!
+     ok Tasten HALT und LOSMACH und SOLL- und SOLL+ sind drin
+     ok Dauerantrieb ginge auch vom Tolino aus. ok geht jetzt sehr gut ok
+     ok mal wieder neuen RAM compilieren ok aber startet nicht bei Takt 1
+        nö Vermutung Takt 1 geht nicht wegen dem vielen NOOP in L LL MM M nö
+        ok aber das ist es: hab in P10 if ZFLAG mit in process rein ok
+        ok und Timing-Strategie ist damit auch wieder zurück auf Strategy1
+        ok also mach ich UHRANF wieder raus und nochmal RAM compilier
+        ok huuu scheint zu gehen. Das ist jetzt wirklich eine Klippe weniger.
+     ok so Pause, erstmal aus und Spirellimach
+     ok FINT wollte ich auch noch probieren ok geht auf anhieb
+     ok aber da vielleicht PIDTAKT wieder weng raufsetzen ok Serielltakt geht perfekt super ok
+     ok überhaupt PIDTAKT mit in P10 generieren, ich nehm CLK_I von seriell
+     ok geht und Stunde ist um,-->commit
+     ok SOLL IST Pfeile weng verbessern noch
+     ok wieso endet Websocket mit Ping???, ah war verrutscht auf 8 9
+     ok noch paar weitere Variablen durchschreiben TAKTZAEHLER, DREIPHASENBIT
+     ok .ARQ interpretieren in FILEINTERPRET, mmentan als "$" ok
+     .. valides .xml wäre auch ganz gut. nochmal ATTRIBUTE versuchen
+     .. eventuell ARQ über mehrere Websocket TCP  oder generell teilen ARQ1 ARQ2
+     .. XML und FF wie kombinieren?
+     .. die CLK's endlich mal richtig benennen, das ist was für git!!!
+
+P01-CLK50: 50   CLK,SPI,PID
+P01-CLK_I: 6    
+P01-CLK_J: 3/12 
+
+git add LOS.txt
+git add DUMPZ*.txt
+git add GANZ*.txt
+git add P*.vhd
+git add WEBSOCKET_TOLINO.xml
+git commit -m ""
+
+
+
+P20 ohne Extra's-> mit Extra's
+ Number of registers:    610->617
+      PFU registers:    579->86
+      PIO registers:    31=
+   Number of SLICEs:          1255 out of  3432 (37%)->1414(41%)
+      SLICEs(logic/ROM):       858 out of   858 (100%)=
+      SLICEs(logic/ROM/RAM):   397 out of  2574 (15%)
+          As RAM:           48 out of  2574 (2%)=
+          As Logic/ROM:    349 out of  2574 (14%)->508
+   Number of logic LUT4s:     1783->2009
+   Number of distributed RAM:  48 (96 LUT4s)=
+   Number of ripple logic:    311 (622 LUT4s)->356
+   Number of shift registers:   0
+   Total number of LUT4s:     2501->2823
+
+
+
+45%+PWM-Generator 1%=
+46%+Sinus-Tabelle lesen 0%=
+46%+3-Phasen-Steuerung X 12%=
+58%+ISTWERT
+63%+SOLLWERT
+65%+2*ERRN*FPROPI
+69%+ERRN:=ERRN32
+82%+2*FINT 5%=
+87%
+
+Wenn .jed einfach nicht läuft:
+-ob constraint drin
+-ob Top-Module angegeben
+-wenn dann nicht geht, TLISTENZEIGER=2EE0
+-Takt 0
+-in P16 die INPUT_P in INPUT
+-wenn dann nicht geht, P31 raus und EXTRA's auch
+-nicht nur USB ab- und zustecken, sondern PC ganz aus und an
+
+
+
+
