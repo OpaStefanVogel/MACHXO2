@@ -1,0 +1,426 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE html PUBLIC
+    "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN"
+    "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink">
+<head>
+  <title>MACHXO2</title>
+<style type="text/css"> 
+body {  font-size:100%; border:solid; margin-right:100px; padding:0px;}
+button { font-size:300%; background-color:pink; border:dotted; }
+.message { white-space:pre-wrap; font-family:Courier,monospace; font-size:90%; width:800px; border: 1px black solid; }
+svg { font-size:150%; border:solid; border-color:cyan; font-family:Courier,monospace; }
+
+  .kursiv { font-style:italic; background-color:aqua; }
+  .tab { background-color:#FFFF66; font-family:Courier,monospace; color:rgb(0,0,256); padding:6px; margin:0px;
+         font-size:120%; text-align:right; padding:6px; margin:8px; }
+  .joy { font-family:Courier,monospace; width:80px; height:80px; }
+  .rosa { background-color:#FFDDDD; }
+  .gelbbox { background-color:#FFFF66; padding:6px; margin:0px; }
+  .gelb { background-color:#FFFF66; padding:6px; margin:8px; } 
+
+  .butbut { font-size:300%; background-color:pink; }
+</style> 
+<!--
+  body { font-family:Arial; font-size:100%; }
+  canvas { border: 1px solid black; }
+  L { background-color:#FFFF66; } 
+-->
+<script type="application/ecmascript">
+<![CDATA[
+//alert("Hallo");
+//var output;
+function init() { 
+  alert("Unmittelbar nach dem OK auf'm Lattice-Bord das SHA1 beantworten!!! Zeit dafür 30 s");
+//  output = document.getElementById("output"); 
+  websocket = new WebSocket("ws://192.168.1.31/WEBSOCKET"); 
+  websocket.onopen = function() {writeToScreen("CONNECTED")}; 
+  websocket.onclose = function() {writeToScreen("DISCONNECTED")}; 
+  websocket.onmessage = function() {
+    var r,v;
+    w=event.data;
+    writeToScreen(w);
+    t=parser.parseFromString(w,"text/xml");
+    SCHAFF("PWM1H");
+    SCHAFF("PWM1L");
+    SCHAFF("PWM2H");
+    SCHAFF("PWM2L");
+    SCHAFF("PWM3H");
+    SCHAFF("PWM3L");
+    //
+    r=getElm("SOLL_X");
+    //SOLLWERT zeichnen
+    r=document.getElementById('SOLL_X').firstChild.nodeValue;
+    v=parseInt(r,16);
+    v=v/1024*360;
+    document.getElementById("svgmot").getElementById("motsollwert").setAttribute("transform","rotate("+v+")");
+    ;
+  }; 
+  websocket.onerror = function() {writeToScreen(event.data)};
+  writeToScreen("CONNECTING..................");
+  event.preventDefault();
+  }
+function ws_close() {
+//  alert("Websocket wird jetzt geschlossen");
+  websocket.close();
+  writeToScreen("CLOSING....................");
+  event.preventDefault();
+  }
+function doSend(message) { 
+  writeToLogArea(message);
+  websocket.send(message);
+  event.preventDefault();
+  } 
+function writeToScreen(message) { 
+  document.getElementById('output').firstChild.nodeValue=message;
+  } 
+function writeToLogArea(message) {
+  d=(new Date());
+//alert((new Date()).toLocaleTimeString()); 
+  document.getElementById('logarea').value=
+  (new Date()).toLocaleTimeString()+" "+message+"\n"+
+  document.getElementById('logarea').value;
+  } 
+  
+
+function jedeSek(){ 
+  websocket.send("WARQ");
+  };
+
+setInterval(jedeSek,1300);
+
+
+function portconv(s) {
+  var r,d;
+  V0="V30";
+  V1="V00";
+  d=0;
+  if (s.charCodeAt(i) == 49) {
+    r="M0,30V00";}else{r="M0,30"
+    }
+  for (var i=1; i<s.length; i++) {
+    d=d+5;
+    if (s.charCodeAt(i) != s.charCodeAt(i-1)) {
+      r=r+"H"+d;
+      if (s.charCodeAt(i) == 49) {
+        r=r+V1;
+        }else{
+        r=r+V0;
+        };
+      };
+    }
+  r=r+"H"+d+V0+"Z";
+//alert(r);
+  return r;
+  }
+
+
+parser=new DOMParser();
+//alert(t);  
+
+onLoad=function() {
+p1h=portconv("11111111000000000000000000000000000011111111111111111111111");
+p1l=portconv("00000000011111111111111111111111111000000000000000000000000");
+p2h=portconv("11000000000000000111111111111111111111111111111111111111111");
+p2l=portconv("00011111111111110000000000000000000000000000000000000000000");
+p3h=portconv("00000000000000000000000000011111111111111111111111000000000");
+p3l=portconv("11111111111111111111111111000000000000000000000000011111111");
+//document.getElementById("PWM1H").setAttribute("d",p1h);
+pwmobj=document.getElementById("svgpwm");
+pwmobj.getElementById("PWM1H").setAttribute("d",p1h);
+pwmobj.getElementById("PWM1L").setAttribute("d",p1l);
+pwmobj.getElementById("PWM2H").setAttribute("d",p2h);
+pwmobj.getElementById("PWM2L").setAttribute("d",p2l);
+pwmobj.getElementById("PWM3H").setAttribute("d",p3h);
+pwmobj.getElementById("PWM3L").setAttribute("d",p3l);
+  }
+
+
+getElm=function(XMLNAME) {
+  var rx=t.getElementsByTagName(XMLNAME)[0].firstChild.nodeValue;
+  document.getElementById(XMLNAME).innerHTML=rx; 
+  return rx;
+  };
+SCHAFF=function(PWM) {
+  p=portconv(t.getElementsByTagName(PWM)[0].firstChild.nodeValue);
+  pwmobj.getElementById(PWM).setAttribute("d",p);  
+  }
+
+]]>
+   </script> 
+<script type="application/ecmascript">
+//[![CDATA[ 
+function Uebernehmen(WOHER,WOMIT){ 
+//  alert(WOHER+WOMIT);
+//  hol_datum('0'+document.getElementById(WOHER).nextSibling.nextSibling.firstChild.value+' '+WOMIT);
+  doSend('0'+document.getElementById(WOHER).nextSibling.nextSibling.firstChild.value+' '+WOMIT);
+  };
+
+var werta="VANF";
+var wertb="VANF +!";
+
+//]]]
+</script>
+<script type="application/ecmascript"> 
+//[![CDATA[
+//<text id="showx" x="10" y="160" align="central" font-size="200%">0</text>
+//<text id="showy" x="10" y="380" align="central" font-size="100%">0</text>
+function schiebstart() { 
+  var distanz = 0;
+  var target = event.target;
+  var xpos = target.getAttribute("x");
+  distanz = xpos-event.touches.item(0).clientX;
+  target.setAttribute("distanz",distanz);
+//  document.getElementById("showy").childNodes[0].nodeValue=max(xpos,0);
+//  alert(target.getAttribute("distanz"));
+//  alert(distanz);
+  event.preventDefault();
+  }
+ 
+function schiebweiter() { 
+  var value;var valuemerk;
+  var target = event.target;
+//alert(event.touches.length);
+//alert(eval(80+target.getAttribute("distanz")));
+//alert(distanz);
+  var xpos = Math.min(695,Math.max(eval(event.touches.item(0).clientX+target.getAttribute("distanz")),0));
+//  var xpos = Math.min(690,Math.max(eval(event.touches.item(0).screenX+target.getAttribute("distanz")),5));
+//  var ypos = Math.max(event.touches.item(0).clientY-70,0);
+//  value=(xpos/10-xpos/10%1)*10-0+(ypos/20-ypos/20%1);
+  value=(xpos*100/695-xpos*100/695%1);
+  target.setAttribute("x",xpos);
+  if (value!=valuemerk) {
+    valuemerk=value;
+    document.getElementById("showxx").childNodes[0].nodeValue=value;
+//    document.getElementById("showy").childNodes[0].nodeValue=event.touches.length;
+    doSend("DEZ "+value+" AMP1 !");
+    }
+  //document.getElementById('output').firstChild.nodeValue=ypos;
+  event.preventDefault();
+  }
+
+// ]]] 
+</script>
+
+  </head>
+<body ontouchstart="eventX.preventDefault()" onload="onLoad()">
+<svg id="svgmot" xmlns="http://www.w3.org/2000/svg" 
+  version="1.1" baseProfile="full"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="280" height="280"
+  viewbox="-512 -512 1024 1024"
+  fill="none" stroke="black">
+<g transform="scale(0.273) translate(512,512)">
+<circle cx="0" cy="0" r="300"/>
+<g id="motistwert" transform="rotate(0)">
+<line x1="0" y1="300" x2="0" y2="-300"/>
+<line x1="0" y1="-350" x2="0" y2="-400"/>
+<text transform="translate(-35,-200) scale(5)">N</text>
+<text transform="translate(-35,290) scale(5)">S</text>
+</g>
+<g id="motistwert2" transform="rotate(120)">
+<line x1="0" y1="300" x2="0" y2="-300"/>
+<text transform="translate(-35,-200) scale(5)">N</text>
+<text transform="translate(-35,290) scale(5)">S</text>
+</g>
+<g id="motistwert3" transform="rotate(240)">
+<line x1="0" y1="300" x2="0" y2="-300"/>
+<text transform="translate(-35,-200) scale(5)">N</text>
+<text transform="translate(-35,290) scale(5)">S</text>
+</g>
+<line id="motsollwert" 
+  x1="0" y1="-400" x2="0" y2="-500" 
+  stroke="red" transform="rotate(0)"/>
+</g>
+<script type="application/ecmascript"> 
+  </script>
+</svg>
+<span class="kursiv">Drücke auf "Starte Websocket"</span>
+<div>
+<button type="button" class="but" ontouchstart="init()">Starte WebSocket</button>
+<button type="button" class="but" ontouchstart="ws_close()">Beende WebSocket</button>
+</div>
+<span class="kursiv">Die vom Lattice empfangenen XML-Daten</span>
+<div id="output" class="message">(im Moment noch nix, 
+  aber vielleicht hoffentlich gleich bald, 
+    wenn alles gut geht
+      mit dem Websocket...)</div> 
+
+<span class="kursiv">werden auf gelbem Hintergrund in die HTML-Seite hineinkopiert,</span>
+<div><input type="button" class="butbut" value="LICHT" ontouchstart="doSend('LICHT');"/>
+<button type="button" class="butbut" ontouchstart="doSend('PAUSE')">PAUSE</button>
+<input type="button" class="butbut" value="NOTAUS" ontouchstart="doSend('NOTAUS')"/>
+</div> 
+
+<table border="1">
+<tr><th>Licht</th>
+<th>Pause</th>
+<th>Taktzähler</th>
+<th>Soll-x-Position</th>
+<th>Soll-y-Position</th>
+<th>Ist- x</th>
+<th>Ist-y</th>
+<th>Stift</th>
+<th>Geschwindigkeit</th></tr>
+<tr class="tab">
+<td id="LICHTBIT">*</td>
+<td id="PAUSENBIT"> </td>
+<td id="TAKT"> </td>
+<td id="SOLL_X">0017</td>
+<td id="SOLL_Y"> </td>
+<td id="IST_X"> </td>
+<td id="IST_Y"> </td>
+<td id="STIFT"> </td>
+<td id="SOLL_V"> </td>
+</tr>
+</table>
+
+<span class="kursiv">und grob gezeichnet (etwas hochscrollen)</span>
+<div>
+<!--<canvas name="can" id="Spartan" width="800" height="360">kein canvas</canvas>-->
+<svg id="wq" xmlns="http://www.w3.org/2000/svg" 
+  version="1.1" baseProfile="full" 
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="100%" height="100%" style="border:double"
+  viewBox="0 0 800 360"
+  preserveAspectRatio="xMinYMin">
+<text x="100" y="100">SVG SVG SVG SVG SVG SVG</text>
+</svg>
+</div>
+
+<span class="kursiv">und auch paar Werte zum Einstellen </span>
+<table><tr><td>
+<table border="1">
+<tr><th>Pixeldecoder</th><th>Istwert</th><th>neuer Wert</th><th>Joystick</th></tr>
+<tr><td>Anfangsgeschwindigkeit in Pixel/Sekunde</td><td class="tab" id="VANF"></td>
+<td><input type="text" value="" size="5" onkeypress="if (event.keyCode==32) Uebernehmen('VANF','VANF !')"/></td>
+<td><input type="radio" name="joyst" ontouchstart="werta='VANF'; wertb='VANF +!';" checked="checked"/></td></tr>
+
+<tr><td>Beschleunigung in Pixel/(Sekunde<sup>2</sup>)</td><td class="tab" id="BESCHL"></td>
+<td><input type="text" value="" size="5" onkeypress="if (event.keyCode==13) Uebernehmen('BESCHL','BESCHL !')"/></td>
+<td><input type="radio" name="joyst" ontouchstart="werta='BESCHL'; wertb='BESCHL +!';"/></td></tr>
+
+<tr><td>Maximalgeschwindigkeit in Pixel/Sekunde</td><td class="tab" id="VMAX"></td>
+<td><input type="text" value="" size="5" onkeypress="if (event.keyCode==13) Uebernehmen('VMAX','VMAX !')"/></td>
+<td><input type="radio" name="joyst" ontouchstart="werta='VMAX'; wertb='VMAX +!';"/></td></tr>
+
+<tr><th>PID-Regler</th><th>Istwert</th><th>neuer Wert</th></tr>
+<tr><td>FPROP proportionaler Anteil</td><td class="tab" id="FPROP"></td>
+<td><input type="text" value="" size="5" onkeypress="if (event.keyCode==13) Uebernehmen('FPROP','FPROP !')"/></td>
+<td><input type="radio" name="joyst" ontouchstart="werta='FPROP'; wertb='FPROP +!';"/></td></tr>
+
+<tr><td>FINT integraler Anteil</td><td class="tab" id="FINT"></td>
+<td><input type="text" value="" size="5" onkeypress="if (event.keyCode==13) Uebernehmen('FINT','FINT ! KURECH')"/></td>
+<td><input type="radio" name="joyst" ontouchstart="werta='FINT'; wertb='FINT +! KURECH';"/></td></tr>
+
+<tr><td>FDIFF differentieller Anteil</td><td id="FDIFF">-</td>
+<td><input type="text" value="" size="5" onkeypress="if (event.keyCode==13) Uebernehmen('FDIFF','FDIFF !')"/></td>
+<td><input type="radio" name="joyst" ontouchstart="werta='FDIFF'; wertb='FDIFF +!';"/></td></tr>
+
+<tr><th>PWM-Generator x</th><th>Istwert</th><th>neuer Wert</th></tr>
+<tr><td>PW-Frequenz in kHz</td><td class="tab" id="PW_FREQUENZ"></td>
+<td><input type="text" value="" size="5" onkeypress="if (event.keyCode==13) Uebernehmen('PW_FREQUENZ','PW_FREQUENZ !')"/></td>
+<td><input type="radio" name="joyst" ontouchstart="werta='PW_FREQUENZ'; wertb='PW_FREQUENZ +!';"/></td></tr>
+
+<tr><td>Amplitude (FFFF=100%)</td><td class="tab" id="AMP_X"></td>
+<td><input type="text" value="" size="5" onkeypress="if (event.keyCode==13) Uebernehmen('AMP_X','AMP1 !')"/></td>
+<td><input type="radio" name="joyst" ontouchstart="werta='AMP_X'; wertb='AMP1 +!';"/></td></tr>
+
+<tr><td>(nur zum Testen: Sollwert X)</td><td class="tab" id="TEST_X"></td>
+<td><input type="text" value="" size="5" onkeypress="if (event.keyCode==13) Uebernehmen('AMP_X','AMP1 !')"/></td>
+<td><input type="radio" name="joyst" ontouchstart="werta='TEST_X'; wertb='0 OVER > SWAP SOLLWERT1 2@ D+ SOLLWERT2 2@ MOVETO';"/></td></tr>
+</table>
+</td>
+<td>
+
+<span>
+<div class="kursiv">Joystick: <br />(vorher mit Radiobutton Zeile auswählen)</div>
+<div>
+<table>
+<tr>
+<td>
+<input type="button" class="joy" value="+1000" ontouchstart="Uebernehmen(werta,' DROP 1000 '+wertb)"/></td><td>
+<input type="button" class="joy" value="+100" ontouchstart="Uebernehmen(werta,' DROP 100 '+wertb)"/></td><td>
+<input type="button" class="joy" value="+10" ontouchstart="Uebernehmen(werta,' DROP 10 '+wertb)"/></td><td>
+<input type="button" class="joy" value="+1" ontouchstart="Uebernehmen(werta,' DROP 1 '+wertb)"/>
+</td>
+</tr>
+<tr>
+<td>
+<input type="button" class="joy" value="-1000" ontouchstart="Uebernehmen(werta,' DROP -1000 '+wertb)"/></td><td>
+<input type="button" class="joy" value="-100" ontouchstart="Uebernehmen(werta,' DROP -100 '+wertb)"/></td><td>
+<input type="button" class="joy" value="-10" ontouchstart="Uebernehmen(werta,' DROP -10 '+wertb)"/></td><td>
+<input type="button" class="joy" value="-1" ontouchstart="Uebernehmen(werta,' DROP -1 '+wertb)"/>
+</td>
+</tr></table>
+</div>
+</span>
+</td>
+</tr></table>
+
+<span class="kursiv">Versuchshalber als Schieberegler</span>
+<div>
+<svg id="svgschieb" xmlns="http://www.w3.org/2000/svg"
+  width="800" height="100">
+<rect id="backg" x="0" y="0" r="10" width="800" height="100" fill="white" stroke="green" stroke-width="1" />
+<rect id="kursor" x="5" y="5" ry="10" width="100" height="90" distanz="0" fill="red" stroke="green" stroke-width="1" 
+ ontouchstart="schiebstart()" ontouchmove="schiebweiter()" ontouchend="schiebweiter()"/>
+
+ </svg>
+AMP1=<span id="showxx">0</span>%</div>
+
+<span class="kursiv">Pegel des 3-Phasen-Treibers: PWM1H, PWM1L, PWM2H, PWM2L, PWM3H, PWM3L, Farbe wo Spannung anliegt</span>
+
+<div>
+<svg id="svgpwm" xmlns="http://www.w3.org/2000/svg"
+  width="400" height="280">
+<path id="PWM1H" transform="translate(90,20)" stroke="red" fill="red" d="M0,0h30Z"/>
+<path id="PWM1L" transform="translate(90,54)" stroke="red" fill="red" d="M0,0h30Z"/>
+<path id="PWM2H" transform="translate(90,110)" stroke="green" fill="green" d="M0,0h30Z"/>
+<path id="PWM2L" transform="translate(90,144)" stroke="green" fill="green" d="M0,0h30Z"/>
+<path id="PWM3H" transform="translate(90,200)" stroke="blue" fill="blue" d="M0,0h30Z"/>
+<path id="PWM3L" transform="translate(90,234)" stroke="blue" fill="blue" d="M0,0h30Z"/>
+<text x="10" y="050">PWM1H</text>
+<text x="10" y="084">PWM1L</text>
+<text x="10" y="140">PWM2H</text>
+<text x="10" y="174">PWM2L</text>
+<text x="10" y="230">PWM3H</text>
+<text x="10" y="264">PWM3L</text>
+
+<script type="application/ecmascript"> 
+  </script>
+</svg>
+</div>
+
+<span class="kursiv">der PID-Regler muss noch eingeschaltet werden</span>
+<div>PID-Regler x-Achse:
+<span class="tab" id="DREIPHASENBIT_X">0000</span>
+<button type="radio" class="butbut" ontouchstart="doSend('-1 DREIPHASENBIT !');">ein</button>
+<button type="radio" class="butbut" ontouchstart="doSend('0 DREIPHASENBIT !');">aus</button>
+</div>
+<div>PID-Regler y-Achse:
+<span class="tab" id="DREIPHASENBIT_Y">0000</span>
+<button type="radio" class="butbut" ontouchstart="doSend('-1 DREIPHASENBITY !');">ein</button>
+<button type="radio" class="butbut" ontouchstart="doSend('0 DREIPHASENBITY !');">aus</button>
+</div>
+<span class="kursiv">schließlich noch paar Rester</span>
+<div>
+<button type="button" class="butbut" ontouchstart="doSend('WARQ')">Testtaste</button>
+</div>
+<div>
+Positionsdetektor X 
+<button type="button" class="butbut" ontouchstart="doSend('POSNULL')">nullsetzen</button>
+und zuguterletzt ein Fahr-Erlebnis-
+<button type="button" class="butbut" ontouchstart="doSend('FES @ NOT FES !')">Schalter</button>
+</div>
+<span class="kursiv">Log-Text (Neuestes obenauf):</span>
+<div>
+<textarea id="logarea" cols="40" rows="20"></textarea>
+</div>
+</body>
+</html>
+
+
+
+
+
