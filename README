@@ -15,10 +15,14 @@ netcat -u 192.168.1.31 80
 
 -----------------------------------------------------------------------
 
+README Fortsetzung:
 
 ( LED's schalten: 
 
-55 2D04 ! ( .*.*.*.*
-AA 2D04 ! ( *.*.*.*.
+55 2D04 ! ( .*.*.*.* )
+AA 2D04 ! ( *.*.*.*. )
 
+( Programm auf Anfangszustand zurücksetzen
+
+RESET
 
