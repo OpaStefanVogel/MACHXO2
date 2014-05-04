@@ -1,1 +1,15 @@
-<p>Hallo?</p><p>geht hier HTML?</p>
+#also
+
+git clone git@192.168.1.205:stefan/machxo2.git
+
+#dann Lattice diamond starten,
+#ein neues Projekt im Verzeichnis machxo2 mit Projektname PROJEKTOR anlegen
+#und mit dem Inhalt von machxo2/PROJEKTOR/source füllen
+
+#dann als toplevelunit Platine01 setzen
+#dann File .Jed generieren
+#und mit dem Programmer auf den MACHXO2 übertragen
+
+#jetzt ist das Programm zugänglich mit
+
+netcat -u 192.168.1.31 80
