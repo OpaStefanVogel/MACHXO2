@@ -418,7 +418,7 @@ Fassung_PID: PID_Prozessor
     
     CLK_O=>open,
     ADR_O=>open,
-    DAT_O=>DAT_ZU_FF,--open,--
+    DAT_O=>DAT_ZU_FF, --open,--
     WE_O=>open
     );
 
