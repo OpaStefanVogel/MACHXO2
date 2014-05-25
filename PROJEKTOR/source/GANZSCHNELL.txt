@@ -357,6 +357,24 @@ ED EMIT 0C EMIT 0A EMIT 4D EMIT 41 EMIT 43 EMIT 48 EMIT 58 EMIT ( ...MACHX */
   D031 @ 2D04 !  
   ;
 ' INT14 4000 + 14 !
+: SPI_KEY_INT ( --> )
+  D031 @ 00FF AND
+  DUP 08 < IF 
+    8 + @ DUP IF DUP EXECUTE END_IF
+    DROP
+    ELSE
+      IRAMADR @ ! 
+      IRAMADR INCR4
+      IRAMADR @ JRAMADR @ - 3FF AND 
+      100 > IF XOFF @ 0= IF -1 XOFF ! 13 EMIT END_IF ( 1 D000 ! ) END_IF 
+      END_IF
+  ;
+: INT14
+  1 INT14COUNT +!
+  D031 @ 2D04 ! 
+  SPI_KEY_INT
+  ;
+' INT14 4000 + 14 !
 : TT
   D031 @ D032 @ OVER D031MERK @ = OVER D032MERK @ = AND NOT IF
     OVER D031MERK ! 
@@ -365,6 +383,106 @@ ED EMIT 0C EMIT 0A EMIT 4D EMIT 41 EMIT 43 EMIT 48 EMIT 58 EMIT ( ...MACHX */
 : P D032 ? D031 ? ;
 BEFESTIGE TT
 ( ENTFERNE TT
+
+100 VARIABLE SPI_EMITBIT
+: SPI_EMIT ( b --> )
+    SPI_EMITBIT @ + 2D05 !
+    BEGIN D031 @ 100 AND SPI_EMITBIT @ = UNTIL
+    SPI_EMITBIT @ IF 0 ELSE 100 END_IF
+    SPI_EMITBIT !
+    ;
+: SPI_WIZ_EMIT ( b --> )
+  WIZ_OPENBIT @ IF
+    CAP @ 2 AND IF DUP ' EMITCODE EXECUTE END_IF
+    WIZ_SEND_BYTE 
+    ELSE DUP SPI_EMIT ' EMITCODE EXECUTE END_IF
+  ;
+REPLACE: EMIT SPI_WIZ_EMIT ;
+
+
+
+(*REM*)
+hierzu mal mit das File sendByte2.js auf dem BBB:
+
+
+var b = require('bonescript');
+var SPI_CLK = "P9_22";
+var SPI_MOSI = "P9_21";
+var SPI_MISO = "P9_18";
+var SPI_CSS = "P9_17";
+b.pinMode(SPI_CLK ,b.OUTPUT,7,'pulldown','fast');
+b.pinMode(SPI_MOSI,b.OUTPUT,7,'pulldown','fast');
+b.pinMode(SPI_MISO,b.INPUT ,7,'pulldown','fast');
+b.pinMode(SPI_CSS ,b.OUTPUT,7,'pulldown','fast');
+b.digitalWrite(SPI_CLK,0);
+b.digitalWrite(SPI_CSS,0);
+
+var EMPFANGENES_BYTE=0;
+SendByte = function(Byte) {
+  EMPFANGENES_BYTE=0;
+  for(var j=0;j<8;j++) {
+    b.digitalWrite(SPI_MOSI,b.bitRead(Byte,7-j));
+    b.digitalWrite(SPI_CLK,1);
+    b.digitalWrite(SPI_CLK,0);
+//    console.log(b.bitRead(Byte,j));
+    EMPFANGENES_BYTE=2*EMPFANGENES_BYTE+b.digitalRead(SPI_MISO);
+//    b.bitWrite(EMPFANGENES_BYTE,j,b.digitalRead(SPI_MISO));
+//    console.log(" READGES: "+EMPFANGENES_BYTE);
+//    console.log(" READ: "+b.digitalRead(SPI_MISO));
+    }
+    if (EMPFANGENES_BYTE>0) {
+       process.stdout.write(String.fromCharCode(EMPFANGENES_BYTE));
+       }
+  };
+SB = function(x,i,z) {
+  SendByte(x.charCodeAt(0));
+//  console.log(" READ: "+b.digitalRead(SPI_MISO));
+  };
+
+//aus std.js
+var stdin = process.stdin;
+stdin.setRawMode( true );
+stdin.setRawMode( true );
+stdin.resume();
+stdin.setEncoding( 'utf8' );
+stdin.on( 'data', function( key ){
+  // ctrl-c ( end of text )
+  if ( key === '\u0003' ) {
+    process.exit();
+  }
+  if ( key === '\u000D' ) {
+//    console.log("");
+    key='\u000A';
+  }
+
+  // write the key to stdout all normal like
+//  process.stdout.write( key );
+//  console.log(key);
+//  console.log(key.length);
+//  console.log(key.charCodeAt(0));
+//  console.log(key.charCodeAt(1));
+//  console.log(key.charCodeAt(2));
+//  console.log(key.charCodeAt(3));
+//  console.log(key.charCodeAt(4));
+//  SendByte(key.charCodeAt(0));
+  key.split("").forEach(SB);
+})
+
+console.log("uuuuuunnnnd - los:");
+
+setInterval(function(){
+  /// call your function here
+  // /console.log("5 Sekunden um");
+  SendByte(0);
+},1);
+
+soweit das File sendByte2.js
+(*END*)
+
+
+( das war alles aus dem GPIO anschalten, 
+( kann bei Gelegenheit auch mal wieder weg:
+
 
 ( cd /sys/class/gpio
 ( ls

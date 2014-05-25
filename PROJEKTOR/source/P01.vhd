@@ -24,7 +24,7 @@ entity Platine01 is
 --===SPI
     SPI_CLK: in STD_LOGIC;
     SPI_MOSI: in STD_LOGIC;
-    SPI_MISO: in STD_LOGIC;--inout
+    SPI_MISO: inout STD_LOGIC;--inout
     SPI_SCSN: in STD_LOGIC;
 --===USER IO
     OUTPUT: inout STD_LOGIC_VECTOR (23 downto 0);
@@ -188,7 +188,7 @@ component UFM_Prozessor is
   Port (
     SPI_CLK: in STD_LOGIC;
     SPI_MOSI: in STD_LOGIC;
-    SPI_MISO: in STD_LOGIC; --inout
+    SPI_MISO: inout STD_LOGIC; --inout
     SPI_SCSN: in STD_LOGIC;
     INT_XY: out STD_LOGIC;
     

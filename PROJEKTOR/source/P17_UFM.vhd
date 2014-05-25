@@ -9,7 +9,7 @@ entity Platine17 is
   Port (
     SPI_CLK: in STD_LOGIC;
     SPI_MOSI: in STD_LOGIC;
-    SPI_MISO: in STD_LOGIC;--inout
+    SPI_MISO: inout STD_LOGIC;--inout
     SPI_SCSN: in STD_LOGIC;
     INT_XY: inout STD_LOGIC;
 
@@ -45,8 +45,9 @@ end component;
 
 signal wb_adr_i,wb_dat_i,wb_dat_o,WB_I: STD_LOGIC_VECTOR (7 downto 0);
 signal wb_clk_i,wb_rst_i,wb_cyc_i,wb_stb_i,wb_we_i,wb_ack_o: STD_LOGIC;
-signal SPI_COUNTER: STD_LOGIC_VECTOR (15 downto 0);
-signal SPI_BYTE_KOMPLETT: STD_LOGIC_VECTOR (7 downto 0);
+signal SPI_COUNTER,EMITBYTE: STD_LOGIC_VECTOR (15 downto 0);
+signal SPI_BYTE_KOMPLETT,SPI_MISO_SENDEBYTE: STD_LOGIC_VECTOR (7 downto 0);
+signal SPI_MISO_SENDEBIT: STD_LOGIC;
 begin
 
 --process begin wait until (CLK_I'event and CLK_I='0');
@@ -135,6 +136,10 @@ Platine_UFM : UFM
 
 
 
+process begin wait until (CLK_I'event and CLK_I='0');
+  if WE_I='1' and ADR_I=x"2D05" then EMITBYTE<=DAT_I; end if;
+  end process;
+
 process 
 variable SPI_COUNT: STD_LOGIC_VECTOR (15 downto 0):=x"0000"; 
 variable SPI_BYTE: STD_LOGIC_VECTOR (7 downto 0):=x"00";
@@ -142,15 +147,21 @@ begin wait until (SPI_CLK'event and SPI_CLK='1');
   SPI_COUNT:=SPI_COUNT+1;
   SPI_COUNTER<=SPI_COUNT;
   SPI_BYTE:=SPI_BYTE(6 downto 0)&SPI_MOSI;
+  SPI_MISO<=SPI_MISO_SENDEBYTE(7);
+  SPI_MISO_SENDEBYTE<=SPI_MISO_SENDEBYTE(6 downto 0)&'0';
   if SPI_COUNT(2 downto 0)="000" then
     SPI_BYTE_KOMPLETT<=SPI_BYTE;
-    INT_XY<=not INT_XY;
+    if not(SPI_MISO_SENDEBIT=EMITBYTE(8)) then
+      SPI_MISO_SENDEBYTE<=EMITBYTE(7 downto 0);
+      SPI_MISO_SENDEBIT<=not SPI_MISO_SENDEBIT;
+      end if;
+    if SPI_BYTE>x"00" then INT_XY<=not INT_XY; end if;
     end if;
   end process;
 
-with ADR_I select 
+with ADR_I select
   DAT_O<=(not wb_ack_o)&"0000000"&wb_dat_o         when x"D030",
-         SPI_MISO&SPI_CLK&SPI_MOSI&SPI_SCSN&"0000"&SPI_BYTE_KOMPLETT when x"D031",
+         SPI_MISO&SPI_CLK&SPI_MOSI&SPI_SCSN&"000"&SPI_MISO_SENDEBIT&SPI_BYTE_KOMPLETT when x"D031",
          SPI_COUNTER                               when x"D032",
          DAT_I when others;
 
