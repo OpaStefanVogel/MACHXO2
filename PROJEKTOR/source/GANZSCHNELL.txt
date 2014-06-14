@@ -402,7 +402,9 @@ REPLACE: EMIT SPI_WIZ_EMIT ;
 
 
 (*REM*)
-
+.. also wenn BBB eingeschaltet wird, geht wohl MOSI von 0 auf 1
+   das könnte ich durch ein PUULLUP ausgleichen am MACHXO2
+.. erst SendByte.txt macht daraus 0
 
 
 aus http://elinux.org/BeagleBone_Black_Enable_SPIDEV
