@@ -2,7 +2,7 @@
 -- Module  Version: 7.2
 --/usr/local/diamond/2.2_x64/ispfpga/bin/lin64/scuba -w -n ramE000bisFFFF -lang vhdl -synth synplify -bus_exp 7 -bb -arch xo2c00 -type bram -wp 10 -rp 1000 -addr_width 13 -data_width 8 -num_rows 8192 -cascade -1 -memfile /home/stefan/machxo2/PROJEKTOR/source/RAM_E000_FFFF.mem -memformat hex -writemode NORMAL -e 
 
--- Sat Jun 14 22:14:06 2014
+-- Sat Jun 14 22:43:08 2014
 
 library IEEE;
 use IEEE.std_logic_1164.all;
