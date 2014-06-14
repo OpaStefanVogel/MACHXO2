@@ -16,8 +16,8 @@ CoreRevision=7.2
 ModuleName=ram2C00bis2FFF
 SourceFormat=VHDL
 ParameterFileVersion=1.0
-Date=02/28/2014
-Time=14:25:06
+Date=06/14/2014
+Time=22:13:42
 
 [Parameters]
 Verilog=0
@@ -41,7 +41,7 @@ Optimization=Speed
 Reset=Sync
 Reset1=Sync
 Init=mem
-MemFile=/home/stefan/MACHXO2/AB_86/source/RAM_2C00_2FFF.mem
+MemFile=/home/stefan/machxo2/PROJEKTOR/source/RAM_2C00_2FFF.mem
 MemFormat=hex
 EnECC=0
 Pipeline=0
@@ -50,4 +50,4 @@ WriteB=ReadBeforeWrite
 init_data=0
 
 [FilesGenerated]
-/home/stefan/MACHXO2/AB_86/source/RAM_2C00_2FFF.mem=mem
+/home/stefan/machxo2/PROJEKTOR/source/RAM_2C00_2FFF.mem=mem

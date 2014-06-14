@@ -16,8 +16,8 @@ CoreRevision=7.2
 ModuleName=ramE000bisFFFF
 SourceFormat=VHDL
 ParameterFileVersion=1.0
-Date=02/28/2014
-Time=14:25:22
+Date=06/14/2014
+Time=22:14:06
 
 [Parameters]
 Verilog=0
@@ -37,7 +37,7 @@ Optimization=Speed
 Reset=Sync
 Reset1=Sync
 Init=mem
-MemFile=/home/stefan/MACHXO2/AB_86/source/RAM_E000_FFFF.mem
+MemFile=/home/stefan/machxo2/PROJEKTOR/source/RAM_E000_FFFF.mem
 MemFormat=hex
 EnECC=0
 Pipeline=0
@@ -45,4 +45,4 @@ Write=Normal
 init_data=0
 
 [FilesGenerated]
-/home/stefan/MACHXO2/AB_86/source/RAM_E000_FFFF.mem=mem
+/home/stefan/machxo2/PROJEKTOR/source/RAM_E000_FFFF.mem=mem
