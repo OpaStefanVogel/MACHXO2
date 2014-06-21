@@ -47,7 +47,7 @@ signal wb_adr_i,wb_dat_i,wb_dat_o,WB_I: STD_LOGIC_VECTOR (7 downto 0);
 signal wb_clk_i,wb_rst_i,wb_cyc_i,wb_stb_i,wb_we_i,wb_ack_o: STD_LOGIC;
 signal SPI_COUNTER,EMITBYTE: STD_LOGIC_VECTOR (15 downto 0);
 signal SPI_BYTE_KOMPLETT,SPI_MISO_SENDEBYTE: STD_LOGIC_VECTOR (7 downto 0);
-signal SPI_MISO_SENDEBIT: STD_LOGIC;
+signal SPI_MISO_SENDEBIT,CSSMERK1,CSSMERK2: STD_LOGIC;
 begin
 
 --process begin wait until (CLK_I'event and CLK_I='0');
@@ -140,10 +140,16 @@ process begin wait until (CLK_I'event and CLK_I='0');
   if WE_I='1' and ADR_I=x"2D05" then EMITBYTE<=DAT_I; end if;
   end process;
 
+process begin wait until (SPI_SCSN'event and SPI_SCSN='0');
+  CSSMERK1<=not CSSMERK2;
+  end process;
+
 process 
 variable SPI_COUNT: STD_LOGIC_VECTOR (15 downto 0):=x"0000"; 
 variable SPI_BYTE: STD_LOGIC_VECTOR (7 downto 0):=x"00";
-begin wait until (SPI_CLK'event and SPI_CLK='1');  
+begin wait until (SPI_CLK'event and SPI_CLK='1');
+  if not(CSSMERK1=CSSMERK2) then SPI_COUNT:=x"0000"; end if;
+  CSSMERK2<=CSSMERK1;
   SPI_COUNT:=SPI_COUNT+1;
   SPI_COUNTER<=SPI_COUNT;
   SPI_BYTE:=SPI_BYTE(6 downto 0)&SPI_MOSI;

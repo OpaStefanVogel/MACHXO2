@@ -1229,7 +1229,8 @@ b.pinMode(SPI_MOSI,b.OUTPUT,7,'pulldown','fast');
 b.pinMode(SPI_MISO,b.INPUT ,7,'pulldown','fast');
 b.pinMode(SPI_CSS ,b.OUTPUT,7,'pulldown','fast');
 b.digitalWrite(SPI_CLK,0);
-b.digitalWrite(SPI_CSS,0);
+b.digitalWrite(SPI_CSS,1);// falls noch 0 von vorher.
+b.digitalWrite(SPI_CSS,0);// macht auch SPI RESET auf MACHXO2
 
 var EMPFANGENES_BYTE=0;
 SendByte = function(Byte) {
@@ -1293,7 +1294,7 @@ setInterval(function(){
 process.on('exit', function(code) {
   // do *NOT* do this
   b.digitalWrite(SPI_CSS,1);
-  console.log('About to exit with code:', code);
+  console.log('Beendet, mit Rückkehrcode:', code);
 });
 
 
