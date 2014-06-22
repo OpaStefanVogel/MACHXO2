@@ -2,7 +2,7 @@
 -- Module  Version: 7.2
 --/usr/local/diamond/2.2_x64/ispfpga/bin/lin64/scuba -w -n ram2C00bis2FFF -lang vhdl -synth synplify -bus_exp 7 -bb -arch xo2c00 -type bram -wp 11 -rp 1010 -data_width 16 -rdata_width 16 -num_rows 1024 -cascade -1 -memfile /home/stefan/machxo2/PROJEKTOR/source/RAM_2C00_2FFF.mem -memformat hex -writemodeA READBEFOREWRITE -writemodeB READBEFOREWRITE -e 
 
--- Sat Jun 14 22:42:46 2014
+-- Sun Jun 22 16:23:20 2014
 
 library IEEE;
 use IEEE.std_logic_1164.all;

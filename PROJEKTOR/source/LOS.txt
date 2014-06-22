@@ -317,5 +317,15 @@ Wenn .jed einfach nicht läuft:
 -nicht nur USB ab- und zustecken, sondern PC ganz aus und an
 
 
+<SPI>
+So, weiter gehts hier auch mal mit:
+ok Hab jetzt SPI nahezu komplett drin, 
+ok der letzte hartnäckige Fehler war das mit dem REPLACE auf HERE.
+was jetzt noch fehlt ist...
+.. SPI_EMIT Startbit auswerten um nicht dauernd SPI laufen zu haben,
+.. überhaupt das schnelle SPI noch in Gang bringen auf'm BBB
+</SPI>
+
+
 
 

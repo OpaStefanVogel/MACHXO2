@@ -210,6 +210,32 @@ component UFM_Prozessor is
 end component;
 for all : UFM_Prozessor use entity work.Platine17(Hufel);
 
+component SPIS_Prozessor is
+  Port (
+    SPI_CLK: in STD_LOGIC;
+    SPI_MOSI: in STD_LOGIC;
+    SPI_MISO: inout STD_LOGIC; --inout
+    SPI_SCSN: in STD_LOGIC;
+    INT_XY: out STD_LOGIC;
+    
+    CLK50_I: in STD_LOGIC;
+    CLK50_O: out STD_LOGIC;
+    CLK6_I: in STD_LOGIC;
+    CLK6_O: out STD_LOGIC;
+
+    CLK_I: in STD_LOGIC;
+    ADR_I: in STD_LOGIC_VECTOR (15 downto 0);
+    DAT_I: in STD_LOGIC_VECTOR (15 downto 0);
+    WE_I: in STD_LOGIC;
+
+    CLK_O: out STD_LOGIC;
+    ADR_O: out STD_LOGIC_VECTOR (15 downto 0);
+    DAT_O: out STD_LOGIC_VECTOR (15 downto 0);
+    WE_O: out STD_LOGIC
+    );
+end component;
+for all : SPIS_Prozessor use entity work.Platine18(Kufel);
+
 component PID_Prozessor is
   Port (
     IO: inout STD_LOGIC_VECTOR (34 downto 1);
@@ -238,7 +264,7 @@ signal NLED: STD_LOGIC_VECTOR (7 downto 0);
 signal ADR_I,DAT_O,DAT_I: STD_LOGIC_VECTOR (15 downto 0);
 signal CLK6_I,CLK_II,CLK_I,WE_I,CLK_50: STD_LOGIC;
 signal DAT_ZU_FF,DAT_ZU_CLK,DAT_ZU_LED: STD_LOGIC_VECTOR (15 downto 0);
-signal DAT_ZU_WIZ,DAT_ZU_SPI,DAT_ZU_UFM,DAT_ZU_PID: STD_LOGIC_VECTOR (15 downto 0);
+signal DAT_ZU_WIZ,DAT_ZU_SPI,DAT_ZU_UFM,DAT_ZU_SPIS,DAT_ZU_PID: STD_LOGIC_VECTOR (15 downto 0);
 signal DAT_ZU_FEHLERSUCH,DAT_ZU_HIN_HER,VOM_FORTH_HERI: STD_LOGIC_VECTOR (15 downto 0);
 
 signal TAKTZAEHLER: STD_LOGIC_VECTOR (47 downto 0);
@@ -246,7 +272,7 @@ signal TAKTZAEHLER: STD_LOGIC_VECTOR (47 downto 0);
 --PID_Prozessor
 signal IO,IO_N: STD_LOGIC_VECTOR (34 downto 1);
 signal IO_EXTRA: STD_LOGIC_VECTOR (40 downto 35);
-signal INTXY,UFM_INT_XY: STD_LOGIC;
+signal INTXY,UFM_INT_XY,NULLI: STD_LOGIC;
 
 begin
 
@@ -379,6 +405,30 @@ Fassung_HIN_HER: HIN_HER_Prozessor
 Fassung_UFM: UFM_Prozessor
   port map (
     SPI_CLK=>SPI_CLK,
+    SPI_MOSI=>'0',--SPI_MOSI,
+    SPI_MISO=>NULLI,--SPI_MISO,
+    SPI_SCSN=>'1',--SPI_SCSN,
+    INT_XY=>open,--UFM_INT_XY,
+    
+    CLK50_I=>CLK_50,
+    CLK50_O=>open,
+    CLK6_I=>CLK6_I,
+    CLK6_O=>open,
+    
+    CLK_I=>CLK_I,
+    ADR_I=>ADR_I,
+    DAT_I=>DAT_ZU_UFM,
+    WE_I=>WE_I,
+    
+    CLK_O=>open,
+    ADR_O=>open,
+    DAT_O=>DAT_ZU_SPIS,
+    WE_O=>open
+    );
+
+Fassung_SPIS: SPIS_Prozessor
+  port map (
+    SPI_CLK=>SPI_CLK,
     SPI_MOSI=>SPI_MOSI,
     SPI_MISO=>SPI_MISO,
     SPI_SCSN=>SPI_SCSN,
@@ -391,7 +441,7 @@ Fassung_UFM: UFM_Prozessor
     
     CLK_I=>CLK_I,
     ADR_I=>ADR_I,
-    DAT_I=>DAT_ZU_UFM,
+    DAT_I=>DAT_ZU_SPIS,
     WE_I=>WE_I,
     
     CLK_O=>open,
@@ -445,6 +495,6 @@ IO_EXTRA(38)<=POS_B;
 --IO_N(20); --POS_A und B auf LED7
 
 --LED<=not(IO(20 downto 13));
-LED<=not NLED;
-
+LED(6 downto 0)<=not NLED(6 downto 0);
+LED(7)<=SPI_SCSN;
 end Striezel;
