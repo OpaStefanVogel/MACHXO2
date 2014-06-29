@@ -563,8 +563,15 @@ echo 1 > /sys/class/gpio/gpio50/value
 b.bitRead(Byte,j)
 
 
+( Interrupt
 
-
+REPLACE: EMIT WIZ_EMIT ;
+55 SPI_EMIT
+( hab jetzt SPI_MISO auf LED7 gelegt
+-1 2D04 !
+0 2D04 ! 
+( und attachInterrupt in sendByte3.js 
+( und das geht schon mal, muss ich jetzt noch ales zusammenknüpfen
 
 
 

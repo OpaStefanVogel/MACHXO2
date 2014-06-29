@@ -430,7 +430,7 @@ Fassung_SPIS: SPIS_Prozessor
   port map (
     SPI_CLK=>SPI_CLK,
     SPI_MOSI=>SPI_MOSI,
-    SPI_MISO=>SPI_MISO,
+    SPI_MISO=>open,--SPI_MISO,
     SPI_SCSN=>SPI_SCSN,
     INT_XY=>UFM_INT_XY,
     
@@ -497,4 +497,5 @@ IO_EXTRA(38)<=POS_B;
 --LED<=not(IO(20 downto 13));
 LED(6 downto 0)<=not NLED(6 downto 0);
 LED(7)<=SPI_SCSN;
+SPI_MISO<=NLED(7);
 end Striezel;

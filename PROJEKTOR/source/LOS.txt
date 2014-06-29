@@ -324,6 +324,9 @@ ok der letzte hartnäckige Fehler war das mit dem REPLACE auf HERE.
 was jetzt noch fehlt ist...
 .. SPI_EMIT Startbit auswerten um nicht dauernd SPI laufen zu haben,
 .. überhaupt das schnelle SPI noch in Gang bringen auf'm BBB
+ok so das attachInterrupt geht jetzt anfänglich für sparsames SPI
+.. muss ich jetzt noch alles zusammenknüpfen
+
 </SPI>
 
 
