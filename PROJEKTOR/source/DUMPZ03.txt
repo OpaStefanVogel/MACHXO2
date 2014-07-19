@@ -1298,6 +1298,91 @@ process.on('exit', function(code) {
   console.log('Beendet, mit Rückkehrcode:', code);
 });
 
+( neu die 9-Bit-Variante
+
+
+var b = require('bonescript');
+var SPI_CLK = "P9_22";
+var SPI_MOSI = "P9_21";
+var SPI_MISO = "P9_18";
+var SPI_CSS = "P9_17";
+b.pinMode(SPI_CLK ,b.OUTPUT,7,'pulldown','fast');
+b.pinMode(SPI_MOSI,b.OUTPUT,7,'pulldown','fast');
+b.pinMode(SPI_MISO,b.INPUT ,7,'pulldown','fast');
+b.pinMode(SPI_CSS ,b.OUTPUT,7,'pulldown','fast');// MISO defekt
+b.digitalWrite(SPI_CLK,0);
+b.digitalWrite(SPI_CSS,1);// falls noch 0 von vorher.
+b.digitalWrite(SPI_CSS,0);// macht auch SPI RESET auf MACHXO2
+
+var EMPFANGENES_BYTE=0;
+SendByte = function(Byte) {
+  EMPFANGENES_BYTE=0;
+  for(var j=0;j<9;j++) {
+    b.digitalWrite(SPI_MOSI,b.bitRead(Byte,8-j));
+    b.digitalWrite(SPI_CLK,1);
+    b.digitalWrite(SPI_CLK,0);
+//    console.log(b.bitRead(Byte,j));
+    EMPFANGENES_BYTE=2*EMPFANGENES_BYTE+b.digitalRead(SPI_MISO);//MISO
+//    b.bitWrite(EMPFANGENES_BYTE,j,b.digitalRead(SPI_MISO));
+//    console.log(" READGES: "+EMPFANGENES_BYTE);
+//    console.log(" READ: "+b.digitalRead(SPI_MISO));
+    }
+    if (EMPFANGENES_BYTE>=256) {EMPFANGENES_BYTE=EMPFANGENES_BYTE-256}
+    if (EMPFANGENES_BYTE>0) {
+//	 console.log(" READGES: "+EMPFANGENES_BYTE);
+       process.stdout.write(String.fromCharCode(EMPFANGENES_BYTE));
+       }
+  };
+
+SB = function(x,i,z) {
+  SendByte(x.charCodeAt(0));
+//  console.log(" READ: "+b.digitalRead(SPI_MISO));
+  };
+
+//aus std.js
+var stdin = process.stdin;
+stdin.setRawMode( true );
+stdin.resume();
+stdin.setEncoding( 'utf8' );
+stdin.on( 'data', function( key ){
+  // ctrl-c ( end of text )
+  if ( key === '\u0003' ) {
+    process.exit();
+  }
+  if ( key === '\u000D' ) {
+//    console.log("");
+    key='\u000A';
+  }
+
+  // write the key to stdout all normal like
+//  process.stdout.write( key );
+//  console.log(key);
+//  console.log(key.length);
+//  console.log(key.charCodeAt(0));
+//  console.log(key.charCodeAt(1));
+//  console.log(key.charCodeAt(2));
+//  console.log(key.charCodeAt(3));
+//  console.log(key.charCodeAt(4));
+//  SendByte(key.charCodeAt(0));
+  key.split("").forEach(SB);
+})
+
+
+console.log("uuuuuunnnnd - los:");
+
+setInterval(function(){
+  /// call your function here
+  // /console.log("5 Sekunden um");
+  SendByte(0);
+},1);
+
+process.on('exit', function(code) {
+  // do *NOT* do this
+  b.digitalWrite(SPI_CSS,1);// schnell noch Chipselect ausschalten
+  console.log('Beendet, mit Rückkehrcode:', code);
+});
+
+
 
 (*END*)
 
