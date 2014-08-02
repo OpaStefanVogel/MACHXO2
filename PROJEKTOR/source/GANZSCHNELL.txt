@@ -574,8 +574,11 @@ REPLACE: EMIT WIZ_EMIT ;
 ( und das geht schon mal, muss ich jetzt noch ales zusammenknüpfen
 
 
-( Ingangsetzen von Adressbit )
+( Ingangsetzen von Adressbit ) sendByte5.js
 REPLACE: EMIT WIZ_EMIT ;
-41 2D05 !
-C1 2D05 !
+42 2D05 !
+143 2D05 !
 ( zuerst EMITBYTE[8] an das Ende nach EMITBYTE[0] positionieren
+so, sendByte5.js hinkt also noch ein Byte hinterher.
+und zwar genau ein Byte, als ob es in P18 zwischengepuffert wird.
+das muss ich nochmal genau durchgucken
