@@ -574,6 +574,10 @@ REPLACE: EMIT WIZ_EMIT ;
 ( und das geht schon mal, muss ich jetzt noch ales zusammenknüpfen
 
 
+( Ingangsetzen von Adressbit )
+41 2D05 !
+C2 2D05 !
+( zuerst EMITBYTE[8] an das Ende nach EMITBYTE[0] positionieren
 
 
 

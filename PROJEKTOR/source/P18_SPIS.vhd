@@ -62,7 +62,7 @@ begin wait until (SPI_CLK'event and SPI_CLK='1');
     SPI_COUNT:=x"0000";
     SPI_BYTE_KOMPLETT<=SPI_BYTE;
     if not(SPI_MISO_SENDEBIT=EMITBYTE(8)) then
-      SPI_MISO_SENDEBYTE(8 downto 0)<=EMITBYTE(8 downto 0);
+      SPI_MISO_SENDEBYTE(8 downto 0)<=EMITBYTE(7 downto 0)&EMITBYTE(8);
       SPI_MISO_SENDEBIT<=not SPI_MISO_SENDEBIT;
       end if;
     if SPI_BYTE>x"00" then INT_XY<=not INT_XY; end if;
