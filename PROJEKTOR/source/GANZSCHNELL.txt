@@ -575,14 +575,7 @@ REPLACE: EMIT WIZ_EMIT ;
 
 
 ( Ingangsetzen von Adressbit )
+REPLACE: EMIT WIZ_EMIT ;
 41 2D05 !
-C2 2D05 !
+C1 2D05 !
 ( zuerst EMITBYTE[8] an das Ende nach EMITBYTE[0] positionieren
-
-
-
-
-
-
-
-
