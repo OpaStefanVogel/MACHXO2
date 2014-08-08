@@ -50,23 +50,27 @@ process begin wait until (SPI_SCSN'event and SPI_SCSN='0');
 process 
 variable SPI_COUNT: STD_LOGIC_VECTOR (15 downto 0):=x"0000"; 
 variable SPI_BYTE: STD_LOGIC_VECTOR (7 downto 0):=x"00";
+variable SPI_MISO_SBYTE: STD_LOGIC_VECTOR (8 downto 0);
 begin wait until (SPI_CLK'event and SPI_CLK='1');
   if not(CSSMERK1=CSSMERK2) then SPI_COUNT:=x"0000"; end if;
+  if SPI_COUNT(3 downto 0)="0000" then
+    if not(SPI_MISO_SENDEBIT=EMITBYTE(8)) then
+      SPI_MISO_SBYTE(8 downto 0):=EMITBYTE(7 downto 0)&EMITBYTE(8);
+      SPI_MISO_SENDEBIT<=not SPI_MISO_SENDEBIT;
+      end if;
+    end if;
   CSSMERK2<=CSSMERK1;
   SPI_COUNT:=SPI_COUNT+1;
   SPI_COUNTER<=SPI_COUNT;
   SPI_BYTE:=SPI_BYTE(6 downto 0)&SPI_MOSI;
-  SPI_MISO_1<=SPI_MISO_SENDEBYTE(8);
+  SPI_MISO_1<=SPI_MISO_SBYTE(8);
   SPI_MISOFLAG<='0';
-  SPI_MISO_SENDEBYTE(8 downto 0)<=SPI_MISO_SENDEBYTE(7 downto 0)&'0';
+  SPI_MISO_SBYTE(8 downto 0):=SPI_MISO_SBYTE(7 downto 0)&'0';
+--  SPI_MISO_SENDEBYTE(8 downto 0)<=SPI_MISO_SENDEBYTE(7 downto 0)&'0';
   if SPI_COUNT(3 downto 0)="1001" then
     SPI_COUNT:=x"0000";
     SPI_BYTE_KOMPLETT<=SPI_BYTE;
     SPI_MISOFLAG<='1';
-    if not(SPI_MISO_SENDEBIT=EMITBYTE(8)) then
-      SPI_MISO_SENDEBYTE(8 downto 0)<=EMITBYTE(7 downto 0)&EMITBYTE(8);
-      SPI_MISO_SENDEBIT<=not SPI_MISO_SENDEBIT;
-      end if;
     if SPI_BYTE>x"00" then INT_XY<=not INT_XY; end if;
     end if;
   end process;
