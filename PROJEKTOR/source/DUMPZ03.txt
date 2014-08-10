@@ -1479,6 +1479,94 @@ process.on('exit', function(code) {
   console.log('Beendet, mit Rückkehrcode:', code);
 });
 
+( ganz neu als .py
+
+#https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/gpio
+import Adafruit_BBIO.GPIO as GPIO; print GPIO
+import sys
+SPI_CLK = "P9_22";
+SPI_MOSI = "P9_21";
+SPI_MISO = "P9_18";
+SPI_CSS = "P9_17";
+GPIO.setup(SPI_CLK , GPIO.OUT)
+GPIO.setup(SPI_MOSI, GPIO.OUT)
+GPIO.setup(SPI_MISO, GPIO.IN)
+GPIO.setup(SPI_CSS , GPIO.OUT)
+
+GPIO.output(SPI_CLK, GPIO.LOW)
+GPIO.output(SPI_CSS, GPIO.HIGH)
+GPIO.output(SPI_CSS, GPIO.LOW)
+
+
+
+if GPIO.input(SPI_MISO):
+    print("HIGH")
+else:
+    print("LOW")
+
+
+
+#GPIO.setup("P8_10", GPIO.OUT)
+#GPIO.output("P8_10", GPIO.HIGH)
+#GPIO.cleanup()
+
+
+#https://wiki.python.org/moin/BitManipulation
+def testBit(int_type, offset):
+    mask = 1 << offset
+    return(int_type & mask)
+#########
+EMPFANGENES_BYTE=0
+ADRESSMERK=0;
+def SendByte(Byte):
+  EMPFANGENES_BYTE=0
+  for j in range(0,9):
+    if testBit(Byte,8-j):
+      GPIO.output(SPI_MOSI,GPIO.HIGH)
+    else:
+      GPIO.output(SPI_MOSI,GPIO.LOW)
+    GPIO.output(SPI_CLK,GPIO.HIGH)
+    GPIO.output(SPI_CLK,GPIO.LOW)
+    EMPFANGENES_BYTE=2*EMPFANGENES_BYTE+GPIO.input(SPI_MISO);
+  EMPFANGENES_BYTE=EMPFANGENES_BYTE/2;
+  if EMPFANGENES_BYTE>0:
+    #print(chr(EMPFANGENES_BYTE),end=""),
+    sys.stdout.write(chr(EMPFANGENES_BYTE))
+
+SendByte(65)
+SendByte(66)
+SendByte(67)
+SendByte(49)
+SendByte(10)
+SendByte(0)
+SendByte(0)
+SendByte(0)
+SendByte(0)
+SendByte(0)
+SendByte(0)
+SendByte(0)
+
+
+print(sys.stdin.read(1))
+print(sys.stdin.read(2))
+print(sys.stdin.read(-1))
+print(sys.stdin.read(-1))
+print(sys.stdin.read(-1))
+
+j=0
+while 1==1:
+  j=sys.stdin.read(1)
+  if j != "":
+    #sys.stdout.write(str(ord(j[0])))
+    SendByte(ord(j[0]))
+  else:
+    SendByte(0)
+
+#ord str int chr hex oct
+#stty -echo -icanon time 0 min 0
+print(9999999)
+
+
 (*END*)
 
 

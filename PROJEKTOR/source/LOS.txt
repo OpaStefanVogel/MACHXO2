@@ -330,7 +330,7 @@ ok statt attachInterrupt mach ich ein Adressbit und MISOFLAG
 ok letzte Korrektur war das nachhinkende EMITBYTE jetzt gleich senden
 .. bis auf das allererste Byte scheint es zu gehen.
 ok gut, Feierabend für heut
-
+ok hab jetzt .py zum laufen gebracht, mit stty -echo -icanon time 0 min 0
 
 </SPI>
 

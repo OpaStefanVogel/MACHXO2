@@ -582,3 +582,20 @@ REPLACE: EMIT WIZ_EMIT ;
 so, sendByte5.js hinkt also noch ein Byte hinterher.
 und zwar genau ein Byte, als ob es in P18 zwischengepuffert wird.
 das muss ich nochmal genau durchgucken
+
+
+
+( mal WEBSOCKET wieder an, jetzt mit Trekstor und Opera+
+( paar mehr Bytes ausgeben weil Opera+ anders sendet
+
+REPLACE: WEBSOCK 
+  TLISTENZEIGER @ >R TLISTE TLISTENZEIGER !
+(  CR F477 28 TYPE CR QUERY 
+  CR F400 200 TYPE CR QUERY 
+  CR 2DUP TYPE
+  ESTADUMP 
+  CR CR
+  DROP F277 1C MOVE
+  F277 1C TYPE
+  R> TLISTENZEIGER !
+  ;
