@@ -599,3 +599,178 @@ REPLACE: WEBSOCK
   F277 1C TYPE
   R> TLISTENZEIGER !
   ;
+  
+REPLACE: EMIT WIZ_EMIT ;
+
+: TT
+  D031 @ D032 @ OVER D031MERK @ = OVER D032MERK @ = AND NOT DROP 1 IF
+    OVER D031MERK ! 
+    DUP D032MERK !
+    FESTPOSITION . . INT14COUNT ? RUCKPOSITION ELSE 2DROP END_IF ;
+: P D032 ? D031 ? ;
+BEFESTIGE TT
+
+0009 1000 CSS
+     2000 MOSI
+     4000 CLK
+     8000 MISO
+( ENTFERNE TT
+
+: SPI_WIZ_OHNE_EMIT ( b --> )
+  WIZ_OPENBIT @ IF
+    CAP @ 2 AND IF DUP ' EMITCODE EXECUTE END_IF
+    WIZ_SEND_BYTE 
+    ELSE SPI_EMIT END_IF
+  ;
+REPLACE: EMIT SPI_WIZ_OHNE_EMIT ;
+REPLACE: EMIT SPI_WIZ_EMIT ;
+
+(*REM*)
+Versuch mit c**
+die heutige Lösung versuch3.cpp:
+die geht jetzt wie .py auch
+#include <iostream>
+#include <fstream>
+#include "linux/kd.h"
+#include "unistd.h"
+using namespace std;
+
+char name;
+int n;
+char buf[1];
+
+ofstream SPI_CLK ("/sys/class/gpio/gpio2/value");
+ofstream SPI_MOSI("/sys/class/gpio/gpio3/value");
+ifstream MISO    ("/sys/class/gpio/gpio4/value");
+ofstream SPI_CSS ("/sys/class/gpio/gpio5/value");
+ifstream ci    ("/dev/tty");
+
+int SendByte(int Byte) {
+  int i ;
+  int EMPFANGENES_BIT ;
+  int EMPFANGENES_BYTE=0 ;
+  //ifstream MISO    ("/sys/class/gpio/gpio4/value");
+  //  MISO >> EMPFANGENES_BYTE ;
+  //  cout << ">>>" << EMPFANGENES_BYTE << "||||" ;
+  //  cout.flush();
+
+//   std::fstream fs;
+
+//   fs.open("/sys/class/gpio/export");
+//   fs << "4";
+//   fs.close();
+//   fs.open("/sys/class/gpio/gpio5/direction");
+//   fs << "in";
+//   fs.close();
+//   fs.open("/sys/class/gpio/gpio5/value");
+//   fs << "1"; // "0" for off
+//   fs.close();
+
+  //2 cout << Byte;
+  for ( i = 0 ; i < 9 ; i++ ) {
+    if ( Byte & ( 1 << ( 8 - i ) ) ) {
+      //2 cout << " M1" ;
+      SPI_MOSI << "1" ;
+      SPI_MOSI.flush() ;
+      } else {
+        //2 cout << " M0" ;
+        SPI_MOSI << "0" ;
+        SPI_MOSI.flush() ;
+        }
+    SPI_CLK << "1" ;
+    SPI_CLK.flush() ;
+    //cout << " C" << i ;
+    SPI_CLK << "0" ;
+    SPI_CLK.flush() ;
+    //cout << " D" ;
+    ifstream MISO ("/sys/class/gpio/gpio4/value");
+    MISO >> EMPFANGENES_BIT ;
+    //cout << EMPFANGENES_BIT ;
+    EMPFANGENES_BYTE = 2 * EMPFANGENES_BYTE + EMPFANGENES_BIT ;
+    //cout.flush();
+    }
+  EMPFANGENES_BYTE = EMPFANGENES_BYTE / 2 ;
+  //cout << " " << char(EMPFANGENES_BYTE) << endl ;
+  cout << char(EMPFANGENES_BYTE) ;
+  cout.flush() ;
+  }
+
+//echo 2 > /sys/class/gpio/export
+//echo out > /sys/class/gpio/gpio2/direction
+//echo 3 > /sys/class/gpio/export
+//echo out > /sys/class/gpio/gpio3/direction
+//echo 4 > /sys/class/gpio/export
+//echo in > /sys/class/gpio/gpio4/direction
+//echo 5 > /sys/class/gpio/export
+//echo out > /sys/class/gpio/gpio5/direction
+//echo 1 > /sys/class/gpio/gpio5/value
+//echo 0 > /sys/class/gpio/gpio5/value
+//echo 4 > /sys/class/gpio/unexport
+//echo 1 > /sys/class/gpio/gpio2/value #CLK  4000
+//echo 0 > /sys/class/gpio/gpio2/value
+//echo 1 > /sys/class/gpio/gpio3/value #MOSI 2000
+//echo 0 > /sys/class/gpio/gpio3/value
+//echo 1 > /sys/class/gpio/gpio5/value #CSS  1000
+//echo 0 > /sys/class/gpio/gpio5/value
+//cat /sys/class/gpio/gpio2/value
+//cat /sys/class/gpio/gpio3/value
+//cat /sys/class/gpio/gpio4/value
+//cat /sys/class/gpio/gpio5/value
+
+int main( void ) {
+  int MISO_IST = 0 ;
+  MISO >> MISO_IST ;
+  int MISO_MERK = 0 ;
+  MISO_MERK = MISO_IST ;
+  cout << "Wie ist Dein Name?:";
+  cin >> name;
+  //cin.get(name);
+  cout << "Hallo, " << name;// << endl;
+  //MISO.get(n);
+  MISO >> n;
+  cout << " " << n;
+  SPI_CLK << "0" ;
+  SPI_CLK.flush() ;
+  SPI_CSS << "0" ;
+  SPI_CSS.flush();
+  SPI_CSS << "0" ;
+  SPI_CSS.flush() ;
+  SendByte(65);
+  SendByte(66);
+  SendByte(67);
+  SendByte(49);
+  SendByte(10);
+  SendByte(0);
+  SendByte(0);
+  SendByte(0);
+  SendByte(0);
+  SendByte(0);
+  SendByte(0);
+
+  cout << endl;
+  while ( name != 'Q' ) {
+    //cin << buf ;
+    if ( read(0, &buf[0], 1) == 1 ) {
+      //2 cout << "W" << buf << buf[0] ;
+      //2 cout << "Y" << name << "Z" ;
+      //  cout.flush();
+      SendByte ( buf [0] ) ;
+      }
+    ifstream MISO ("/sys/class/gpio/gpio4/value");
+    MISO >> MISO_IST ;
+    if ( MISO_IST != MISO_MERK ) {
+        MISO_MERK = MISO_IST ;
+        SendByte ( 0 ) ;
+      }
+    }
+  }
+//stty -echo -icanon time 0 min 0
+//stty echo -icanon time 0 min 0
+//stty raw echo opost isig -icanon time 0 min 0
+//stty raw -echo opost isig -icanon time 0 min 0
+//g++ versuch3.cpp
+//./a.out
+//echo 12354321 | ./a.out
+
+(*END*)
+
