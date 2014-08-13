@@ -331,6 +331,12 @@ ok letzte Korrektur war das nachhinkende EMITBYTE jetzt gleich senden
 .. bis auf das allererste Byte scheint es zu gehen.
 ok gut, Feierabend für heut
 ok hab jetzt .py zum laufen gebracht, mit stty -echo -icanon time 0 min 0
+ok .cpp läuft auch, etwa mit gleicher Geschwindigkeit,
+ok .c läuft auch etwa mit gleicher Geschwindigkeit,
+.. es hängt an dem ständigen open(MISO).
+.. die serielle abschaltbar machen
+.. MISO auch abschaltbar machen
+.. und SPI_EMIT gleich mit in INIT1 rein, damit von Anfang an startbar
 
 </SPI>
 

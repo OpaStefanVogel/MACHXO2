@@ -625,6 +625,7 @@ BEFESTIGE TT
 REPLACE: EMIT SPI_WIZ_OHNE_EMIT ;
 REPLACE: EMIT SPI_WIZ_EMIT ;
 
+
 (*REM*)
 Versuch mit c**
 die heutige Lösung versuch3.cpp:
@@ -773,4 +774,125 @@ int main( void ) {
 //echo 12354321 | ./a.out
 
 (*END*)
+
+(*REM*)
+// alles in C
+#include <stdio.h>
+#include "unistd.h"
+
+char name;
+int n;
+char buf[1];
+
+FILE *MISO ;
+FILE *SPI_CLK;
+FILE *SPI_MOSI;
+FILE *SPI_CSS;
+
+int SendByte(int Byte) {
+  int i ;
+  char EMPFANGENES_BIT, EMPFANGENES_CHAR ;
+  int EMPFANGENES_BYTE=0 ;
+
+  for ( i = 0 ; i < 9 ; i++ ) {
+    if ( Byte & ( 1 << ( 8 - i ) ) ) {
+      fputc('1',SPI_MOSI) ; fflush(SPI_MOSI) ;
+      n=1 ;
+      } else {
+        n=2;
+        //2 cout << " M0" ;
+        fputc('0',SPI_MOSI) ; fflush(SPI_MOSI) ;
+        }
+    fputc('1',SPI_CLK) ; fflush(SPI_CLK) ;
+    fputc('0',SPI_CLK) ; fflush(SPI_CLK) ;
+    MISO = fopen ( "/sys/class/gpio/gpio4/value" , "r" );
+    EMPFANGENES_CHAR  = fgetc ( (FILE*)MISO ) ;
+    //fputc('0',MISO) ; fflush(MISO) ;
+    fclose ( MISO ) ;
+    EMPFANGENES_BIT = EMPFANGENES_CHAR == '1' ? 1 : 0;
+    //printf("Bit: ") ; putchar(EMPFANGENES_CHAR); printf("\n");
+    EMPFANGENES_BYTE = 2 * EMPFANGENES_BYTE + EMPFANGENES_BIT ;
+    //cout.flush();
+    }
+  EMPFANGENES_BYTE = EMPFANGENES_BYTE / 2 ;
+  if ( EMPFANGENES_BYTE > 0 ) {
+    putchar(EMPFANGENES_BYTE);fflush(0);
+    }
+  }
+//echo 2 > /sys/class/gpio/export
+//echo out > /sys/class/gpio/gpio2/direction
+//echo 3 > /sys/class/gpio/export
+//echo out > /sys/class/gpio/gpio3/direction
+//echo 4 > /sys/class/gpio/export
+//echo in > /sys/class/gpio/gpio4/direction
+//echo 5 > /sys/class/gpio/export
+//echo out > /sys/class/gpio/gpio5/direction
+//echo 1 > /sys/class/gpio/gpio5/value
+//echo 0 > /sys/class/gpio/gpio5/value
+//echo 4 > /sys/class/gpio/unexport   
+//echo 1 > /sys/class/gpio/gpio2/value #CLK  4000
+//echo 0 > /sys/class/gpio/gpio2/value
+//echo 1 > /sys/class/gpio/gpio3/value #MOSI 2000
+//echo 0 > /sys/class/gpio/gpio3/value
+//echo 1 > /sys/class/gpio/gpio5/value #CSS  1000
+//echo 0 > /sys/class/gpio/gpio5/value
+//cat /sys/class/gpio/gpio2/value
+//cat /sys/class/gpio/gpio3/value   
+//cat /sys/class/gpio/gpio4/value
+//cat /sys/class/gpio/gpio5/value
+char getMISO() {
+  MISO = fopen ( "/sys/class/gpio/gpio4/value" , "r" );
+  int wert = fgetc ( (FILE*)MISO ) ;
+  fclose ( MISO ) ;
+  return wert ;
+  }
+
+main() {
+  char MISO_IST;
+  SPI_CLK  = fopen("/sys/class/gpio/gpio2/value" , "w" );
+  SPI_MOSI = fopen("/sys/class/gpio/gpio3/value" , "w" );
+  SPI_CSS  = fopen("/sys/class/gpio/gpio5/value" , "w" );
+  MISO = fopen ( "/sys/class/gpio/gpio4/value" , "r" );
+  MISO_IST = getMISO();
+  char MISO_MERK ;
+  MISO_MERK = MISO_IST ;
+  printf("von xterm ueber GPIO zu SPI") ;
+  name = getchar ( ) ;
+  putchar ( name ) ;
+  printf(" X\nY\n");
+  n = getMISO();
+  putchar ( n ) ;
+  n = getMISO();
+  putchar ( n ) ;
+  printf(" \n====\n");
+
+  fputc('0',SPI_CLK) ; fflush(SPI_CLK) ;
+  fputc('1',SPI_CSS) ; fflush(SPI_CSS) ;
+  fputc('0',SPI_CSS) ; fflush(SPI_CSS) ; // reset SPI
+
+  SendByte(65);
+  SendByte(66);
+  SendByte(67);
+  SendByte(49);
+  SendByte(10);
+  
+///  cout << endl;
+  while ( 1 ) {
+    if ( read( 0 , &buf[0], 1) == 1 ) { SendByte ( buf [0] ) ; }
+    MISO_IST = getMISO(); //fgetc ( (FILE*)MISO ) ;
+    if ( MISO_IST != MISO_MERK ) {
+        MISO_MERK = MISO_IST ;
+        SendByte ( 0 ) ;
+      }
+    }
+  }
+
+//stty -echo -icanon time 0 min 0
+//stty echo -icanon time 0 min 0
+//stty raw echo opost isig -icanon time 0 min 0
+//stty raw -echo opost isig -icanon time 0 min 0
+//g++ versuch3.cpp
+//./a.out
+//echo 12354321 | ./a.out
+
 
