@@ -377,30 +377,30 @@ Fassung_SPI: SPI_Prozessor
 
     CLK_O=>open,
     ADR_O=>open,
-    DAT_O=>DAT_ZU_FF,--DAT_ZU_HIN_HER,
+    DAT_O=>DAT_ZU_HIN_HER,
     WE_O=>open
     );
 
---Fassung_HIN_HER: HIN_HER_Prozessor
-  --port map (
-    --OUTPUT=>OUTPUT,
-    --INPUT=>INPUT,
+Fassung_HIN_HER: HIN_HER_Prozessor
+  port map (
+    OUTPUT=>OUTPUT,
+    INPUT=>INPUT,
 
-    --CLK50_I=>CLK_50,
-    --CLK50_O=>open,
-    --CLK6_I=>CLK6_I,
-    --CLK6_O=>open,
+    CLK50_I=>CLK_50,
+    CLK50_O=>open,
+    CLK6_I=>CLK6_I,
+    CLK6_O=>open,
     
-    --CLK_I=>CLK_I,
-    --ADR_I=>ADR_I,
-    --DAT_I=>DAT_ZU_HIN_HER,
-    --WE_I=>WE_I,
+    CLK_I=>CLK_I,
+    ADR_I=>ADR_I,
+    DAT_I=>DAT_ZU_HIN_HER,
+    WE_I=>WE_I,
 
-    --CLK_O=>open,
-    --ADR_O=>open,
-    --DAT_O=>DAT_ZU_UFM,
-    --WE_O=>open
-    --);
+    CLK_O=>open,
+    ADR_O=>open,
+    DAT_O=>DAT_ZU_FF,--DAT_ZU_UFM,
+    WE_O=>open
+    );
 
 --Fassung_UFM: UFM_Prozessor
   --port map (
