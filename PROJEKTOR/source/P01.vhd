@@ -398,33 +398,33 @@ Fassung_HIN_HER: HIN_HER_Prozessor
 
     CLK_O=>open,
     ADR_O=>open,
-    DAT_O=>DAT_ZU_FF,--DAT_ZU_UFM,
+    DAT_O=>DAT_ZU_UFM,
     WE_O=>open
     );
 
---Fassung_UFM: UFM_Prozessor
-  --port map (
-    --SPI_CLK=>SPI_CLK,
-    --SPI_MOSI=>'0',--SPI_MOSI,
-    --SPI_MISO=>NULLI,--SPI_MISO,
-    --SPI_SCSN=>'1',--SPI_SCSN,
-    --INT_XY=>open,--UFM_INT_XY,
+Fassung_UFM: UFM_Prozessor
+  port map (
+    SPI_CLK=>SPI_CLK,
+    SPI_MOSI=>'0',--SPI_MOSI,
+    SPI_MISO=>NULLI,--SPI_MISO,
+    SPI_SCSN=>'1',--SPI_SCSN,
+    INT_XY=>open,--UFM_INT_XY,
     
-    --CLK50_I=>CLK_50,
-    --CLK50_O=>open,
-    --CLK6_I=>CLK6_I,
-    --CLK6_O=>open,
+    CLK50_I=>CLK_50,
+    CLK50_O=>open,
+    CLK6_I=>CLK6_I,
+    CLK6_O=>open,
     
-    --CLK_I=>CLK_I,
-    --ADR_I=>ADR_I,
-    --DAT_I=>DAT_ZU_UFM,
-    --WE_I=>WE_I,
+    CLK_I=>CLK_I,
+    ADR_I=>ADR_I,
+    DAT_I=>DAT_ZU_UFM,
+    WE_I=>WE_I,
     
-    --CLK_O=>open,
-    --ADR_O=>open,
-    --DAT_O=>DAT_ZU_SPIS,
-    --WE_O=>open
-    --);
+    CLK_O=>open,
+    ADR_O=>open,
+    DAT_O=>DAT_ZU_FF,--DAT_ZU_SPIS,
+    WE_O=>open
+    );
 
 --Fassung_SPIS: SPIS_Prozessor
   --port map (
