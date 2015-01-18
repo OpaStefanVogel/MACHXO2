@@ -446,31 +446,31 @@ Fassung_SPIS: SPIS_Prozessor
     
     CLK_O=>open,
     ADR_O=>open,
-    DAT_O=>DAT_ZU_FF,--DAT_ZU_PID,
+    DAT_O=>DAT_ZU_PID,
     WE_O=>open
     );
 
---Fassung_PID: PID_Prozessor
-  --port map (
-    --IO=>IO_N,
-    --IO_EXTRA=>IO_EXTRA,
-    --INTXY=>INTXY,
+Fassung_PID: PID_Prozessor
+  port map (
+    IO=>IO_N,
+    IO_EXTRA=>IO_EXTRA,
+    INTXY=>INTXY,
     
-    --CLK50_I=>CLK_50,
-    --CLK50_O=>open,
-    --CLK6_I=>CLK6_I,
-    --CLK6_O=>open,
+    CLK50_I=>CLK_50,
+    CLK50_O=>open,
+    CLK6_I=>CLK6_I,
+    CLK6_O=>open,
     
-    --CLK_I=>CLK_I,
-    --ADR_I=>ADR_I,
-    --DAT_I=>DAT_ZU_PID,
-    --WE_I=>WE_I,
+    CLK_I=>CLK_I,
+    ADR_I=>ADR_I,
+    DAT_I=>DAT_ZU_PID,
+    WE_I=>WE_I,
     
-    --CLK_O=>open,
-    --ADR_O=>open,
-    --DAT_O=>DAT_ZU_FF,--open,--
-    --WE_O=>open
-    --);
+    CLK_O=>open,
+    ADR_O=>open,
+    DAT_O=>DAT_ZU_FF,--open,--
+    WE_O=>open
+    );
 
 PWM1H<=IO_N(21);
 PWM1L<=IO_N(22);
