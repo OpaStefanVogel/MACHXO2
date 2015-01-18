@@ -311,30 +311,30 @@ Fassung_CLK: CLK_Prozessor
 
     CLK_O=>CLK_I,
     ADR_O=>open,
-    DAT_O=>DAT_ZU_LED,
+    DAT_O=>DAT_ZU_WIZ,--DAT_ZU_LED,
     WE_O=>open
     );
 
-Fassung_LED: LED_Prozessor
-  port map (
-    LED=>NLED,
-    TAKTZAEHLER=>TAKTZAEHLER,
+--Fassung_LED: LED_Prozessor
+  --port map (
+    --LED=>NLED,
+    --TAKTZAEHLER=>TAKTZAEHLER,
 
-    CLK50_I=>CLK_50,--'0',--
-    CLK50_O=>open,
-    CLK6_I=>CLK6_I,
-    CLK6_O=>open,
+    --CLK50_I=>CLK_50,--'0',--
+    --CLK50_O=>open,
+    --CLK6_I=>CLK6_I,
+    --CLK6_O=>open,
     
-    CLK_I=>CLK_I,
-    ADR_I=>ADR_I,
-    DAT_I=>DAT_ZU_LED,
-    WE_I=>WE_I,
+    --CLK_I=>CLK_I,
+    --ADR_I=>ADR_I,
+    --DAT_I=>DAT_ZU_LED,
+    --WE_I=>WE_I,
 
-    CLK_O=>open,
-    ADR_O=>open,
-    DAT_O=>DAT_ZU_WIZ,
-    WE_O=>open
-    );
+    --CLK_O=>open,
+    --ADR_O=>open,
+    --DAT_O=>DAT_ZU_WIZ,
+    --WE_O=>open
+    --);
 
 Fassung_WIZ: WIZ_Prozessor
   port map (
