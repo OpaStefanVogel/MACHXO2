@@ -275,45 +275,45 @@ signal IO_EXTRA: STD_LOGIC_VECTOR (40 downto 35);
 signal INTXY,UFM_INT_XY,NULLI: STD_LOGIC;
 
 begin
+RS232_TXD<=RS232_RXD;
+--Fassung_P: FortyForthProzessor
+  --port map (
+    --RxD=>RS232_RXD,
+    --TxD=>RS232_TXD,
+    --INTXY=>UFM_INT_XY,--RS232_RXD,--INTXY,
 
-Fassung_P: FortyForthProzessor
-  port map (
-    RxD=>RS232_RXD,
-    TxD=>RS232_TXD,
-    INTXY=>UFM_INT_XY,--RS232_RXD,--INTXY,
-
-    CLK50_I=>CLK_50,
-    CLK50_O=>open,
-    CLK6_I=>CLK6_I,
-    CLK6_O=>open,
+    --CLK50_I=>CLK_50,
+    --CLK50_O=>open,
+    --CLK6_I=>CLK6_I,
+    --CLK6_O=>open,
     
-    CLK_I=>CLK_I,
-    ADR_I=>x"0000",
-    DAT_I=>DAT_ZU_FF,
-    WE_I=>'0',
+    --CLK_I=>CLK_I,
+    --ADR_I=>x"0000",
+    --DAT_I=>DAT_ZU_FF,
+    --WE_I=>'0',
 
-    CLK_O=>open,
-    ADR_O=>ADR_I,
-    DAT_O=>DAT_ZU_CLK,
-    WE_O=>WE_I
-    );
+    --CLK_O=>open,
+    --ADR_O=>ADR_I,
+    --DAT_O=>DAT_ZU_CLK,
+    --WE_O=>WE_I
+    --);
 
-Fassung_CLK: CLK_Prozessor
-  port map (
-    TAKTZAEHLER=>TAKTZAEHLER,
-    CLK50_O=>CLK_50,
-    CLK6_O=>CLK6_I,
+--Fassung_CLK: CLK_Prozessor
+  --port map (
+    --TAKTZAEHLER=>TAKTZAEHLER,
+    --CLK50_O=>CLK_50,
+    --CLK6_O=>CLK6_I,
 
-    CLK_I=>CLK_I,
-    ADR_I=>ADR_I,
-    DAT_I=>DAT_ZU_CLK,
-    WE_I=>WE_I,
+    --CLK_I=>CLK_I,
+    --ADR_I=>ADR_I,
+    --DAT_I=>DAT_ZU_CLK,
+    --WE_I=>WE_I,
 
-    CLK_O=>CLK_I,
-    ADR_O=>open,
-    DAT_O=>DAT_ZU_WIZ,--DAT_ZU_LED,
-    WE_O=>open
-    );
+    --CLK_O=>CLK_I,
+    --ADR_O=>open,
+    --DAT_O=>DAT_ZU_WIZ,--DAT_ZU_LED,
+    --WE_O=>open
+    --);
 
 --Fassung_LED: LED_Prozessor
   --port map (
@@ -336,50 +336,50 @@ Fassung_CLK: CLK_Prozessor
     --WE_O=>open
     --);
 
-Fassung_WIZ: WIZ_Prozessor
-  port map (
-    WIZ_nSS=>WIZ_nSS,
-    WIZ_nINT=>WIZ_nINT,
-    WIZ_PWDN=>WIZ_PWDN,
-    WIZ_nRESET=>WIZ_nRESET,
+--Fassung_WIZ: WIZ_Prozessor
+  --port map (
+    --WIZ_nSS=>WIZ_nSS,
+    --WIZ_nINT=>WIZ_nINT,
+    --WIZ_PWDN=>WIZ_PWDN,
+    --WIZ_nRESET=>WIZ_nRESET,
 
-    CLK50_I=>CLK_50,
-    CLK50_O=>open,
-    CLK6_I=>CLK6_I,
-    CLK6_O=>open,
+    --CLK50_I=>CLK_50,
+    --CLK50_O=>open,
+    --CLK6_I=>CLK6_I,
+    --CLK6_O=>open,
     
-    CLK_I=>CLK_I,
-    ADR_I=>ADR_I,
-    DAT_I=>DAT_ZU_WIZ,
-    WE_I=>WE_I,
+    --CLK_I=>CLK_I,
+    --ADR_I=>ADR_I,
+    --DAT_I=>DAT_ZU_WIZ,
+    --WE_I=>WE_I,
 
-    CLK_O=>open,
-    ADR_O=>open,
-    DAT_O=>DAT_ZU_SPI,
-    WE_O=>open
-    );
+    --CLK_O=>open,
+    --ADR_O=>open,
+    --DAT_O=>DAT_ZU_SPI,
+    --WE_O=>open
+    --);
 
-Fassung_SPI: SPI_Prozessor
-  port map (
-    SPI_MISO=>WIZ_MISO,
-    SPI_MOSI=>WIZ_MOSI,
-    SPI_SCK=>WIZ_SCLK,
+--Fassung_SPI: SPI_Prozessor
+  --port map (
+    --SPI_MISO=>WIZ_MISO,
+    --SPI_MOSI=>WIZ_MOSI,
+    --SPI_SCK=>WIZ_SCLK,
 
-    CLK50_I=>CLK_50,
-    CLK50_O=>open,
-    CLK6_I=>CLK6_I,
-    CLK6_O=>open,
+    --CLK50_I=>CLK_50,
+    --CLK50_O=>open,
+    --CLK6_I=>CLK6_I,
+    --CLK6_O=>open,
     
-    CLK_I=>CLK_I,
-    ADR_I=>ADR_I,
-    DAT_I=>DAT_ZU_SPI,
-    WE_I=>WE_I,
+    --CLK_I=>CLK_I,
+    --ADR_I=>ADR_I,
+    --DAT_I=>DAT_ZU_SPI,
+    --WE_I=>WE_I,
 
-    CLK_O=>open,
-    ADR_O=>open,
-    DAT_O=>DAT_ZU_FF,--DAT_ZU_HIN_HER,
-    WE_O=>open
-    );
+    --CLK_O=>open,
+    --ADR_O=>open,
+    --DAT_O=>DAT_ZU_FF,--DAT_ZU_HIN_HER,
+    --WE_O=>open
+    --);
 
 --Fassung_HIN_HER: HIN_HER_Prozessor
   --port map (
