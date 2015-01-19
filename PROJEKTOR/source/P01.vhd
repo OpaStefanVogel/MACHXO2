@@ -11,7 +11,15 @@ entity Platine01 is
     RS232_RXD: in  STD_LOGIC;
     RS232_TXD: out STD_LOGIC;
 --===LED'S
-    LED: inout STD_LOGIC_VECTOR (7 downto 0);
+--    LED: inout STD_LOGIC_VECTOR (7 downto 0);
+    LED_7: out STD_LOGIC;
+    LED_6: out STD_LOGIC;
+    LED_5: out STD_LOGIC;
+    LED_4: out STD_LOGIC;
+    LED_3: out STD_LOGIC;
+    LED_2: out STD_LOGIC;
+    LED_1: out STD_LOGIC;
+    LED_0: out STD_LOGIC;
 --====WIZ
     WIZ_nSS: out STD_LOGIC;
     WIZ_nINT: in STD_LOGIC;
@@ -64,7 +72,8 @@ component FortyForthProzessor is
     CLK_O: out STD_LOGIC;
     ADR_O: out STD_LOGIC_VECTOR (15 downto 0);
     DAT_O: out STD_LOGIC_VECTOR (15 downto 0);
-    WE_O: out STD_LOGIC
+    WE_O: out STD_LOGIC;
+  SIM_PC: out STD_LOGIC_VECTOR (15 downto 0)
     );
 end component;
 for all : FortyForthProzessor use entity work.Platine20(CR4000);
@@ -274,13 +283,14 @@ signal IO,IO_N: STD_LOGIC_VECTOR (34 downto 1);
 signal IO_EXTRA: STD_LOGIC_VECTOR (40 downto 35);
 signal INTXY,UFM_INT_XY,NULLI: STD_LOGIC;
 
+signal SIM_PC: STD_LOGIC_VECTOR (15 downto 0);
 begin
 --RS232_TXD<=RS232_RXD;
 Fassung_P: FortyForthProzessor
   port map (
     RxD=>RS232_RXD,
     TxD=>RS232_TXD,
-    INTXY=>UFM_INT_XY,--RS232_RXD,--INTXY,
+    INTXY=>'0',--UFM_INT_XY,--RS232_RXD,--INTXY,
 
     CLK50_I=>CLK_50,
     CLK50_O=>open,
@@ -295,7 +305,10 @@ Fassung_P: FortyForthProzessor
     CLK_O=>open,
     ADR_O=>ADR_I,
     DAT_O=>DAT_ZU_CLK,
-    WE_O=>WE_I
+    WE_O=>WE_I,
+    
+  SIM_PC=>SIM_PC
+
     );
 
 Fassung_CLK: CLK_Prozessor
@@ -332,54 +345,54 @@ Fassung_LED: LED_Prozessor
 
     CLK_O=>open,
     ADR_O=>open,
-    DAT_O=>DAT_ZU_FF,--DAT_ZU_WIZ,
+    DAT_O=>DAT_ZU_WIZ,
     WE_O=>open
     );
 
---Fassung_WIZ: WIZ_Prozessor
-  --port map (
-    --WIZ_nSS=>WIZ_nSS,
-    --WIZ_nINT=>WIZ_nINT,
-    --WIZ_PWDN=>WIZ_PWDN,
-    --WIZ_nRESET=>WIZ_nRESET,
+Fassung_WIZ: WIZ_Prozessor
+  port map (
+    WIZ_nSS=>WIZ_nSS,
+    WIZ_nINT=>WIZ_nINT,
+    WIZ_PWDN=>WIZ_PWDN,
+    WIZ_nRESET=>WIZ_nRESET,
 
-    --CLK50_I=>CLK_50,
-    --CLK50_O=>open,
-    --CLK6_I=>CLK6_I,
-    --CLK6_O=>open,
+    CLK50_I=>CLK_50,
+    CLK50_O=>open,
+    CLK6_I=>CLK6_I,
+    CLK6_O=>open,
     
-    --CLK_I=>CLK_I,
-    --ADR_I=>ADR_I,
-    --DAT_I=>DAT_ZU_WIZ,
-    --WE_I=>WE_I,
+    CLK_I=>CLK_I,
+    ADR_I=>ADR_I,
+    DAT_I=>DAT_ZU_WIZ,
+    WE_I=>WE_I,
 
-    --CLK_O=>open,
-    --ADR_O=>open,
-    --DAT_O=>DAT_ZU_SPI,
-    --WE_O=>open
-    --);
+    CLK_O=>open,
+    ADR_O=>open,
+    DAT_O=>DAT_ZU_SPI,
+    WE_O=>open
+    );
 
---Fassung_SPI: SPI_Prozessor
-  --port map (
-    --SPI_MISO=>WIZ_MISO,
-    --SPI_MOSI=>WIZ_MOSI,
-    --SPI_SCK=>WIZ_SCLK,
+Fassung_SPI: SPI_Prozessor
+  port map (
+    SPI_MISO=>WIZ_MISO,
+    SPI_MOSI=>WIZ_MOSI,
+    SPI_SCK=>WIZ_SCLK,
 
-    --CLK50_I=>CLK_50,
-    --CLK50_O=>open,
-    --CLK6_I=>CLK6_I,
-    --CLK6_O=>open,
+    CLK50_I=>CLK_50,
+    CLK50_O=>open,
+    CLK6_I=>CLK6_I,
+    CLK6_O=>open,
     
-    --CLK_I=>CLK_I,
-    --ADR_I=>ADR_I,
-    --DAT_I=>DAT_ZU_SPI,
-    --WE_I=>WE_I,
+    CLK_I=>CLK_I,
+    ADR_I=>ADR_I,
+    DAT_I=>DAT_ZU_SPI,
+    WE_I=>WE_I,
 
-    --CLK_O=>open,
-    --ADR_O=>open,
-    --DAT_O=>DAT_ZU_FF,--DAT_ZU_HIN_HER,
-    --WE_O=>open
-    --);
+    CLK_O=>open,
+    ADR_O=>open,
+    DAT_O=>DAT_ZU_FF,--DAT_ZU_HIN_HER,
+    WE_O=>open
+    );
 
 --Fassung_HIN_HER: HIN_HER_Prozessor
   --port map (
@@ -495,7 +508,13 @@ IO_EXTRA(38)<=POS_B;
 --IO_N(20); --POS_A und B auf LED7
 
 --LED<=not(IO(20 downto 13));
-LED(6 downto 0)<=not NLED(6 downto 0);
-LED(7)<=SPI_SCSN;
+LED_0<=not SIM_PC(0);--not SIM_PC(0);--not NLED(0);
+LED_1<=not SIM_PC(1);--not SIM_PC(1);--not NLED(1);
+LED_2<=not SIM_PC(2);--nnot NLED(2);--not SIM_PC(2);--not NLED(2);
+LED_3<=not SIM_PC(3);--nnot NLED(3);--not SIM_PC(3);--CLK_I;
+LED_4<=not SIM_PC(4);--nnot NLED(4);--not SIM_PC(4);--'0';
+LED_5<=not SIM_PC(5);--nnot NLED(5);--not SIM_PC(5);--TAKTZAEHLER(22);
+LED_6<=not SIM_PC(6);--'0';
+LED_7<=CLK_I;--SPI_SCSN;
 --SPI_MISO<=NLED(7);
 end Striezel;

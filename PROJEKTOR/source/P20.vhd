@@ -24,7 +24,11 @@ entity Platine20 is
     CLK_O: out STD_LOGIC;
     ADR_O: out STD_LOGIC_VECTOR (15 downto 0);
     DAT_O: out STD_LOGIC_VECTOR (15 downto 0);
-    WE_O: out STD_LOGIC
+    WE_O: out STD_LOGIC;
+    
+  SIM_PC: out STD_LOGIC_VECTOR (15 downto 0)
+    
+    
    );
 end Platine20;
 
@@ -55,11 +59,11 @@ signal RXDI: STD_LOGIC:='1';
 signal FETCHX: STD_LOGIC_VECTOR (15 downto 0);
 signal WSTORE_ZUM_RAM: STD_LOGIC;
 --STRG Tasten:
-signal STRG,STRG_RUHEND,STRG_M,STRG_MERK,STRG_MERK_RUHEND: STD_LOGIC;
+signal STRG,STRG_RUHEND,STRG_M,STRG_MERK,STRG_MERK_RUHEND: STD_LOGIC:='0';
 signal dbInput_RUHEND,dbInput_M: STD_LOGIC_VECTOR (7 downto 0):=x"00"; -- die auszugebende Hexzahl
 
 --INT:
-signal INTXY_INT,INTXY_MERK: STD_LOGIC;
+signal INTXY_INT,INTXY_MERK: STD_LOGIC:='0';
 
 ----IO-Ersatz:
 --signal INTXY: STD_LOGIC;
@@ -125,7 +129,8 @@ ADR_O<=ADRESSE_ZUM_RAM;
 DAT_O<=STORE_ZUM_RAM;
 WE_O<=WSTORE_ZUM_RAM;
 
-
+--FSuch
+SIM_PC<=PC_ZUM_RAM;
 
 
 
@@ -202,9 +207,10 @@ begin wait until (CLK_I'event and CLK_I='1');
   A:=R(P(SP-4));
   T:=0;
  
-  if PD="101-1-----------" then  --Returnbit auswerten
-    PC:=RPCC; RP:=RP+1; PD(11):='0';
-    elsif PD(15 downto 14)="01" then -- 4000-7FFF Unterprogrammaufruf
+  --if PD="101-1-----------" then  --Returnbit auswerten
+    --PC:=RPCC; RP:=RP+1; PD(11):='0';
+    --els
+  if PD(15 downto 14)="01" then -- 4000-7FFF Unterprogrammaufruf
 --    when "010-------------" => -- 4000-5FFF Unterprogrammaufruf
       RPC:=PC;
       PC:=PD and x"3FFF";
