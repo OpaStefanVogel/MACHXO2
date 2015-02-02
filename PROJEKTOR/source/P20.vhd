@@ -318,56 +318,56 @@ begin wait until (CLK_I'event and CLK_I='1');
 
 
 --EXTRAS
- elsif PD=x"A012" then --D+ 32 BIT ADDITION
-    SUMME:=(A&B)+(C&D);
-    C:=SUMME(31 downto 16);
-    D:=SUMME(15 downto 0);
-    SP:=SP-2;T:=2;
- elsif PD=x"A013" then --D- 32 BIT SUBTRAKTION
-    SUMME:=(A&B)-(C&D);
-    C:=SUMME(31 downto 16);
-    D:=SUMME(15 downto 0);
-    T:=2;
-    SP:=SP-2;
- elsif PD=x"A014" then -- DIVISION_MIT_REST 32B/16B=16R/16Q
-    B:=B(14 downto 0)&C(15);
-    C:=C(14 downto 0)&'0';
-    if B>=D then
+ --elsif PD=x"A012" then --D+ 32 BIT ADDITION
+    --SUMME:=(A&B)+(C&D);
+    --C:=SUMME(31 downto 16);
+    --D:=SUMME(15 downto 0);
+    --SP:=SP-2;T:=2;
+ --elsif PD=x"A013" then --D- 32 BIT SUBTRAKTION
+    --SUMME:=(A&B)-(C&D);
+    --C:=SUMME(31 downto 16);
+    --D:=SUMME(15 downto 0);
+    --T:=2;
+    --SP:=SP-2;
+ --elsif PD=x"A014" then -- DIVISION_MIT_REST 32B/16B=16R/16Q
+    --B:=B(14 downto 0)&C(15);
+    --C:=C(14 downto 0)&'0';
+    --if B>=D then
 
-   B:=B-D;
-      C(0):='1';
-      end if;
-    T:=3;
- elsif PD=x"A016" then -- TOGGLE
-      STORE:=not EXFET;STOREADRESSE:=D;
-      WSTORE:='1' ;
-      T:=0;
- elsif PD=x"A015" then -- CRC32 modifiziert
-    CRC_SUMME:="00000000"&A(7 downto 0)&B(7 downto 0)&C(7 downto 0)&D(7 downto 0);
-    if D(0)/=D(8) then
-      CRC_SUMME:=CRC_SUMME xor "0000000111011011011100010000011001000001";
-      --                        -------111011011011100010000011001000001
-      --G(x) = x32x26x23x22x16x12x11x10x8x7x5x4x2x1x0
-      end if;
-    D:="0"&D(15 downto 9)&CRC_SUMME(8 downto 1);
-    C:="00000000"&CRC_SUMME(16 downto 9);
-    B:="00000000"&CRC_SUMME(24 downto 17);
-    A:="00000000"&CRC_SUMME(32 downto 25);
-    T:=4;
+   --B:=B-D;
+      --C(0):='1';
+      --end if;
+    --T:=3;
+ --elsif PD=x"A016" then -- TOGGLE
+      --STORE:=not EXFET;STOREADRESSE:=D;
+      --WSTORE:='1' ;
+      --T:=0;
+ --elsif PD=x"A015" then -- CRC32 modifiziert
+    --CRC_SUMME:="00000000"&A(7 downto 0)&B(7 downto 0)&C(7 downto 0)&D(7 downto 0);
+    --if D(0)/=D(8) then
+      --CRC_SUMME:=CRC_SUMME xor "0000000111011011011100010000011001000001";
+          -- -- --            -------111011011011100010000011001000001
+          -- --- --- --- G(x) = x32x26x23x22x16x12x11x10x8x7x5x4x2x1x0
+      --end if;
+    --D:="0"&D(15 downto 9)&CRC_SUMME(8 downto 1);
+    --C:="00000000"&CRC_SUMME(16 downto 9);
+    --B:="00000000"&CRC_SUMME(24 downto 17);
+    --A:="00000000"&CRC_SUMME(32 downto 25);
+    --T:=4;
 
-    elsif PD=x"A01B" then -- MCR
-      case R(P(SP-1)) is
-        when "----------101000"--noch auf if ummachen wenn benoetigt
-        | "----------111010"
-        | "----------010111"
-        | "----------000101"
-        | "--------01101111"
-        | "--------11110110"
-        | "--------10010000"
-        | "--------00001001" => R(P(SP-1)):=x"FFFF";
-        when others => R(P(SP-1)):=x"0000";
-        end case;
-      W(P(SP-1)):='1';
+    --elsif PD=x"A01B" then -- MCR
+      --case R(P(SP-1)) is
+        --when "----------101000"--noch auf if ummachen wenn benoetigt
+        --| "----------111010"
+        --| "----------010111"
+        --| "----------000101"
+        --| "--------01101111"
+        --| "--------11110110"
+        --| "--------10010000"
+        --| "--------00001001" => R(P(SP-1)):=x"FFFF";
+        --when others => R(P(SP-1)):=x"0000";
+        --end case;
+      --W(P(SP-1)):='1';
 
 -- else 
 --    STAK:=x"0000";
