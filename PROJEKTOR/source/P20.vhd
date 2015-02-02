@@ -462,7 +462,7 @@ begin wait until (CLK6_I'event and CLK6_I='1');
 --                  120C bei 115200 und 53.2 MHz
 --      if stoppbit='1' then
           dbInput<=dbInput_L;
-          STRG<=not STRG_MERK_RUHEND;
+--          STRG<=not STRG_MERK_RUHEND;
 --        end if;		  
       else 
         if scount>0 then scount:=scount+08; -- D0000, D000 statt 1100
