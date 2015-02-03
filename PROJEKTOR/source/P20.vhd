@@ -122,6 +122,7 @@ component ramE000bisFFFF
 end component;
 
 signal EXTRATAKT:  STD_LOGIC;
+signal DUMPD: STD_LOGIC_VECTOR (15 downto 0);
 begin
 
 
@@ -131,7 +132,9 @@ DAT_O<=STORE_ZUM_RAM;
 WE_O<=WSTORE_ZUM_RAM;
 
 --FSuch
-SIM_PC<=PC_ZUM_RAM;
+--SIM_PC<=PC_ZUM_RAM;
+SIM_PC<=SP_ZUM_RAM;
+--SIM_PC<=DUMPD;
 
 
 
@@ -285,8 +288,8 @@ begin wait until (CLK_I'event and CLK_I='1');
     elsif PD=x"A00A" then -- FETCH Speicheradresse lesen
       case D is
         when x"D000" => D:=x"00"&KEYCODE_L;
---        when x"D001" => D:=CONV_STD_LOGIC_VECTOR(SP,16);
-        when x"D001" => D:=CONV_UNSIGNED(SP,16);
+        when x"D001" => D:=CONV_STD_LOGIC_VECTOR(SP,16);
+--        when x"D001" => D:=CONV_UNSIGNED(SP,16);
         when x"D002" => D:=RP;
         when x"D003" => D:=PC;
         when others => D:=EXFET;
@@ -315,7 +318,13 @@ begin wait until (CLK_I'event and CLK_I='1');
       C:=R(P(SP-1-CONV_INTEGER(STAK(3 downto 2))));
       B:=R(P(SP-1-CONV_INTEGER(STAK(5 downto 4))));
       A:=R(P(SP-1-CONV_INTEGER(STAK(7 downto 6))));
-      SP:=SP+CONV_INTEGER(PD(11 downto 8))-4;
+--  DUMPD<=CONV_STD_LOGIC_VECTOR(CONV_INTEGER(PD(11 downto 8)),16);
+      --SP:=SP+CONV_INTEGER(PD(11 downto 8))-4;
+      if PD(11 downto 8)="0010" then SP:=SP-2;
+      elsif PD(11 downto 8)="0011" then SP:=SP-1;
+      elsif PD(11 downto 8)="0101" then SP:=SP+1;
+      elsif PD(11 downto 8)="0110" then SP:=SP+2;
+      end if;
 
 
 
@@ -392,14 +401,14 @@ begin wait until (CLK_I'event and CLK_I='1');
   if T>3 then R(P(SP-4)):=A;W(P(SP-4)):='1'; end if;
   PC_ZUM_RAM<=PC;
   SP_ZUM_RAM<=CONV_STD_LOGIC_VECTOR(SP,16);
-  --ADRESSE_ZUM_STAPEL(0)<=CONV_STD_LOGIC_VECTOR(SP-1,16) and x"FFFD";
-  --ADRESSE_ZUM_STAPEL(1)<=CONV_STD_LOGIC_VECTOR(SP-2,16) and x"FFFD";
-  --ADRESSE_ZUM_STAPEL(2)<=CONV_STD_LOGIC_VECTOR(SP-3,16) or x"0002";
-  --ADRESSE_ZUM_STAPEL(3)<=CONV_STD_LOGIC_VECTOR(SP-4,16) or x"0002";
-  ADRESSE_ZUM_STAPEL(0)<=CONV_UNSIGNED(SP-1,16) and x"FFFD";
-  ADRESSE_ZUM_STAPEL(1)<=CONV_UNSIGNED(SP-2,16) and x"FFFD";
-  ADRESSE_ZUM_STAPEL(2)<=CONV_UNSIGNED(SP-3,16) or x"0002";
-  ADRESSE_ZUM_STAPEL(3)<=CONV_UNSIGNED(SP-4,16) or x"0002";
+  ADRESSE_ZUM_STAPEL(0)<=CONV_STD_LOGIC_VECTOR(SP-1,16) and x"FFFD";
+  ADRESSE_ZUM_STAPEL(1)<=CONV_STD_LOGIC_VECTOR(SP-2,16) and x"FFFD";
+  ADRESSE_ZUM_STAPEL(2)<=CONV_STD_LOGIC_VECTOR(SP-3,16) or x"0002";
+  ADRESSE_ZUM_STAPEL(3)<=CONV_STD_LOGIC_VECTOR(SP-4,16) or x"0002";
+  --ADRESSE_ZUM_STAPEL(0)<=CONV_UNSIGNED(SP-1,16) and x"FFFD";
+  --ADRESSE_ZUM_STAPEL(1)<=CONV_UNSIGNED(SP-2,16) and x"FFFD";
+  --ADRESSE_ZUM_STAPEL(2)<=CONV_UNSIGNED(SP-3,16) or x"0002";
+  --ADRESSE_ZUM_STAPEL(3)<=CONV_UNSIGNED(SP-4,16) or x"0002";
   STORE_ZUM_STAPEL(0)<=R(0);
   STORE_ZUM_STAPEL(1)<=R(1);
   STORE_ZUM_STAPEL(2)<=R(2);
