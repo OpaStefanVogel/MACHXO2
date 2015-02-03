@@ -284,7 +284,7 @@ begin wait until (CLK_I'event and CLK_I='1');
         when others => WSTORE:='1' ;
         end case;
       T:=0;
-      SP:=SP-2;
+      SP:=SP-1;SP:=SP-1;
     elsif PD=x"A00A" then -- FETCH Speicheradresse lesen
       case D is
         when x"D000" => D:=x"00"&KEYCODE_L;
