@@ -345,54 +345,54 @@ Fassung_LED: LED_Prozessor
 
     CLK_O=>open,
     ADR_O=>open,
-    DAT_O=>DAT_ZU_FF,--DAT_ZU_WIZ,
+    DAT_O=>DAT_ZU_WIZ,
     WE_O=>open
     );
 
---Fassung_WIZ: WIZ_Prozessor
-  --port map (
-    --WIZ_nSS=>WIZ_nSS,
-    --WIZ_nINT=>WIZ_nINT,
-    --WIZ_PWDN=>WIZ_PWDN,
-    --WIZ_nRESET=>WIZ_nRESET,
+Fassung_WIZ: WIZ_Prozessor
+  port map (
+    WIZ_nSS=>WIZ_nSS,
+    WIZ_nINT=>WIZ_nINT,
+    WIZ_PWDN=>WIZ_PWDN,
+    WIZ_nRESET=>WIZ_nRESET,
 
-    --CLK50_I=>CLK_50,
-    --CLK50_O=>open,
-    --CLK6_I=>CLK6_I,
-    --CLK6_O=>open,
+    CLK50_I=>CLK_50,
+    CLK50_O=>open,
+    CLK6_I=>CLK6_I,
+    CLK6_O=>open,
     
-    --CLK_I=>CLK_I,
-    --ADR_I=>ADR_I,
-    --DAT_I=>DAT_ZU_WIZ,
-    --WE_I=>WE_I,
+    CLK_I=>CLK_I,
+    ADR_I=>ADR_I,
+    DAT_I=>DAT_ZU_WIZ,
+    WE_I=>WE_I,
 
-    --CLK_O=>open,
-    --ADR_O=>open,
-    --DAT_O=>DAT_ZU_SPI,
-    --WE_O=>open
-    --);
+    CLK_O=>open,
+    ADR_O=>open,
+    DAT_O=>DAT_ZU_SPI,
+    WE_O=>open
+    );
 
---Fassung_SPI: SPI_Prozessor
-  --port map (
-    --SPI_MISO=>WIZ_MISO,
-    --SPI_MOSI=>WIZ_MOSI,
-    --SPI_SCK=>WIZ_SCLK,
+Fassung_SPI: SPI_Prozessor
+  port map (
+    SPI_MISO=>WIZ_MISO,
+    SPI_MOSI=>WIZ_MOSI,
+    SPI_SCK=>WIZ_SCLK,
 
-    --CLK50_I=>CLK_50,
-    --CLK50_O=>open,
-    --CLK6_I=>CLK6_I,
-    --CLK6_O=>open,
+    CLK50_I=>CLK_50,
+    CLK50_O=>open,
+    CLK6_I=>CLK6_I,
+    CLK6_O=>open,
     
-    --CLK_I=>CLK_I,
-    --ADR_I=>ADR_I,
-    --DAT_I=>DAT_ZU_SPI,
-    --WE_I=>WE_I,
+    CLK_I=>CLK_I,
+    ADR_I=>ADR_I,
+    DAT_I=>DAT_ZU_SPI,
+    WE_I=>WE_I,
 
-    --CLK_O=>open,
-    --ADR_O=>open,
-    --DAT_O=>DAT_ZU_FF,--DAT_ZU_HIN_HER,
-    --WE_O=>open
-    --);
+    CLK_O=>open,
+    ADR_O=>open,
+    DAT_O=>DAT_ZU_FF,--DAT_ZU_HIN_HER,
+    WE_O=>open
+    );
 
 --Fassung_HIN_HER: HIN_HER_Prozessor
   --port map (

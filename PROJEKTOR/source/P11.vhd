@@ -13,7 +13,7 @@ use machxo2.all;
 
 entity Platine11 is
   Port (
-    LED: inout STD_LOGIC_VECTOR (7 downto 0);
+    LED: out STD_LOGIC_VECTOR (7 downto 0);
     TAKTZAEHLER: in STD_LOGIC_VECTOR (47 downto 0);
 
     CLK50_I: in STD_LOGIC;
@@ -90,7 +90,7 @@ begin
 --ergaenzt um 2Cxx
 process begin wait until (CLK_I'event and CLK_I='0');
   if WE_I='1' then
-    if ADR_I=x"2D04" then LED<=DAT_I(7 downto 0); 
+    if ADR_I=x"2D04" then LEDX<=DAT_I(7 downto 0); 
     --elsif ADR_I=x"2C20" then LED(0)<=DAT_I(0); 
     --elsif ADR_I=x"2C21" then LED(1)<=DAT_I(0); 
     --elsif ADR_I=x"2C22" then LED(2)<=DAT_I(0); 
@@ -101,9 +101,10 @@ process begin wait until (CLK_I'event and CLK_I='0');
     --elsif ADR_I=x"2C27" then LED(7)<=DAT_I(0); 
     end if; end if;
   end process;
+LED<=LEDX;
 
 with ADR_I select 
-  DAT_O<="00000000"&LED when x"D00C",
+  DAT_O<="00000000"&LEDX when x"D00C",
          --x"0"&REVCOUNTER when x"D020",
          --x"0"&WLED(1) when x"D021",
          DAT_I when others;
