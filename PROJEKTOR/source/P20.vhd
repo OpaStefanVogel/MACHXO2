@@ -82,7 +82,8 @@ type STAPELTYPE is array(0 to 31) of STD_LOGIC_VECTOR (15 downto 0);
 signal stap1,stap2,stap3,stap0: STAPELTYPE;
 
 function P (SP : integer) return integer is begin
-  return CONV_INTEGER(CONV_STD_LOGIC_VECTOR(SP,1024)(1 downto 0));
+--  return CONV_INTEGER(CONV_STD_LOGIC_VECTOR(SP,1024)(1 downto 0));
+  return CONV_INTEGER(CONV_UNSIGNED(SP,2));
   end;
 
 -- parameterized module component declaration
@@ -284,7 +285,8 @@ begin wait until (CLK_I'event and CLK_I='1');
     elsif PD=x"A00A" then -- FETCH Speicheradresse lesen
       case D is
         when x"D000" => D:=x"00"&KEYCODE_L;
-        when x"D001" => D:=CONV_STD_LOGIC_VECTOR(SP,16);
+--        when x"D001" => D:=CONV_STD_LOGIC_VECTOR(SP,16);
+        when x"D001" => D:=CONV_UNSIGNED(SP,16);
         when x"D002" => D:=RP;
         when x"D003" => D:=PC;
         when others => D:=EXFET;
@@ -390,10 +392,14 @@ begin wait until (CLK_I'event and CLK_I='1');
   if T>3 then R(P(SP-4)):=A;W(P(SP-4)):='1'; end if;
   PC_ZUM_RAM<=PC;
   SP_ZUM_RAM<=CONV_STD_LOGIC_VECTOR(SP,16);
-  ADRESSE_ZUM_STAPEL(0)<=CONV_STD_LOGIC_VECTOR(SP-1,16) and x"FFFD";
-  ADRESSE_ZUM_STAPEL(1)<=CONV_STD_LOGIC_VECTOR(SP-2,16) and x"FFFD";
-  ADRESSE_ZUM_STAPEL(2)<=CONV_STD_LOGIC_VECTOR(SP-3,16) or x"0002";
-  ADRESSE_ZUM_STAPEL(3)<=CONV_STD_LOGIC_VECTOR(SP-4,16) or x"0002";
+  --ADRESSE_ZUM_STAPEL(0)<=CONV_STD_LOGIC_VECTOR(SP-1,16) and x"FFFD";
+  --ADRESSE_ZUM_STAPEL(1)<=CONV_STD_LOGIC_VECTOR(SP-2,16) and x"FFFD";
+  --ADRESSE_ZUM_STAPEL(2)<=CONV_STD_LOGIC_VECTOR(SP-3,16) or x"0002";
+  --ADRESSE_ZUM_STAPEL(3)<=CONV_STD_LOGIC_VECTOR(SP-4,16) or x"0002";
+  ADRESSE_ZUM_STAPEL(0)<=CONV_UNSIGNED(SP-1,16) and x"FFFD";
+  ADRESSE_ZUM_STAPEL(1)<=CONV_UNSIGNED(SP-2,16) and x"FFFD";
+  ADRESSE_ZUM_STAPEL(2)<=CONV_UNSIGNED(SP-3,16) or x"0002";
+  ADRESSE_ZUM_STAPEL(3)<=CONV_UNSIGNED(SP-4,16) or x"0002";
   STORE_ZUM_STAPEL(0)<=R(0);
   STORE_ZUM_STAPEL(1)<=R(1);
   STORE_ZUM_STAPEL(2)<=R(2);
