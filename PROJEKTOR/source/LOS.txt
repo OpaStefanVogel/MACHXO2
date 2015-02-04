@@ -340,6 +340,4 @@ ok .c läuft auch etwa mit gleicher Geschwindigkeit,
 
 </SPI>
 
-
-
-
+So, nun hab ich tüchtig zu tun gehabt, dass Diamond3.4 auch läuft ok.

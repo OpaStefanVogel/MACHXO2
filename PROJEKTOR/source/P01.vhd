@@ -390,54 +390,54 @@ Fassung_SPI: SPI_Prozessor
 
     CLK_O=>open,
     ADR_O=>open,
-    DAT_O=>DAT_ZU_FF,--DAT_ZU_HIN_HER,
+    DAT_O=>DAT_ZU_HIN_HER,
     WE_O=>open
     );
 
---Fassung_HIN_HER: HIN_HER_Prozessor
-  --port map (
-    --OUTPUT=>OUTPUT,
-    --INPUT=>INPUT,
+Fassung_HIN_HER: HIN_HER_Prozessor
+  port map (
+    OUTPUT=>OUTPUT,
+    INPUT=>INPUT,
 
-    --CLK50_I=>CLK_50,
-    --CLK50_O=>open,
-    --CLK6_I=>CLK6_I,
-    --CLK6_O=>open,
+    CLK50_I=>CLK_50,
+    CLK50_O=>open,
+    CLK6_I=>CLK6_I,
+    CLK6_O=>open,
     
-    --CLK_I=>CLK_I,
-    --ADR_I=>ADR_I,
-    --DAT_I=>DAT_ZU_HIN_HER,
-    --WE_I=>WE_I,
+    CLK_I=>CLK_I,
+    ADR_I=>ADR_I,
+    DAT_I=>DAT_ZU_HIN_HER,
+    WE_I=>WE_I,
 
-    --CLK_O=>open,
-    --ADR_O=>open,
-    --DAT_O=>DAT_ZU_UFM,
-    --WE_O=>open
-    --);
+    CLK_O=>open,
+    ADR_O=>open,
+    DAT_O=>DAT_ZU_UFM,
+    WE_O=>open
+    );
 
---Fassung_UFM: UFM_Prozessor
-  --port map (
-    --SPI_CLK=>SPI_CLK,
-    --SPI_MOSI=>'0',--SPI_MOSI,
-    --SPI_MISO=>NULLI,--SPI_MISO,
-    --SPI_SCSN=>'1',--SPI_SCSN,
-    --INT_XY=>open,--UFM_INT_XY,
+Fassung_UFM: UFM_Prozessor
+  port map (
+    SPI_CLK=>SPI_CLK,
+    SPI_MOSI=>'0',--SPI_MOSI,
+    SPI_MISO=>NULLI,--SPI_MISO,
+    SPI_SCSN=>'1',--SPI_SCSN,
+    INT_XY=>open,--UFM_INT_XY,
     
-    --CLK50_I=>CLK_50,
-    --CLK50_O=>open,
-    --CLK6_I=>CLK6_I,
-    --CLK6_O=>open,
+    CLK50_I=>CLK_50,
+    CLK50_O=>open,
+    CLK6_I=>CLK6_I,
+    CLK6_O=>open,
     
-    --CLK_I=>CLK_I,
-    --ADR_I=>ADR_I,
-    --DAT_I=>DAT_ZU_UFM,
-    --WE_I=>WE_I,
+    CLK_I=>CLK_I,
+    ADR_I=>ADR_I,
+    DAT_I=>DAT_ZU_UFM,
+    WE_I=>WE_I,
     
-    --CLK_O=>open,
-    --ADR_O=>open,
-    --DAT_O=>DAT_ZU_SPIS,
-    --WE_O=>open
-    --);
+    CLK_O=>open,
+    ADR_O=>open,
+    DAT_O=>DAT_ZU_FF,--DAT_ZU_SPIS,
+    WE_O=>open
+    );
 
 --Fassung_SPIS: SPIS_Prozessor
   --port map (
@@ -514,6 +514,8 @@ LED_2<=not NLED(2);--not SIM_PC(2);--nnot NLED(2);--not SIM_PC(2);--not NLED(2);
 LED_3<=not NLED(3);--not SIM_PC(3);--nnot NLED(3);--not SIM_PC(3);--CLK_I;
 LED_4<=not NLED(4);--not SIM_PC(4);--nnot NLED(4);--not SIM_PC(4);--'0';
 LED_5<=not NLED(5);--not SIM_PC(5);--nnot NLED(5);--not SIM_PC(5);--TAKTZAEHLER(22);
+LED_6<=not WE_I;--'0';
+LED_7<=CLK_I;--SPI_SCSN;
 --LED_6<=not NLED(6);--not SIM_PC(6);--'0';
 --LED_2<=not DAT_ZU_LED(0);--not SIM_PC(4);--nnot NLED(4);--not SIM_PC(4);--'0';
 --LED_3<=not DAT_ZU_LED(1);--not NLED(5);--not SIM_PC(5);--nnot NLED(5);--not SIM_PC(5);--TAKTZAEHLER(22);
@@ -540,7 +542,5 @@ LED_5<=not NLED(5);--not SIM_PC(5);--nnot NLED(5);--not SIM_PC(5);--TAKTZAEHLER(
 --LED_3<=not ADR_I(3);--nnot NLED(3);--not SIM_PC(3);--CLK_I;
 --LED_4<=not ADR_I(4);--nnot NLED(4);--not SIM_PC(4);--'0';
 --LED_5<=not ADR_I(5);--nnot NLED(5);--not SIM_PC(5);--TAKTZAEHLER(22);
-LED_6<=not WE_I;--'0';
-LED_7<=CLK_I;--SPI_SCSN;
 --SPI_MISO<=NLED(7);
 end Striezel;
