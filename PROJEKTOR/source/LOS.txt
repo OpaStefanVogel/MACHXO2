@@ -382,4 +382,7 @@ ok UFM ist auch wieder drin
       ok so, jetzt versuche ich schnell noch statt dem case ein if... ok hat auch diesen Defekt.
       Feierabend Schluss für heut.
       
-
+Weiter von branch ERROR_in_case_whe_SP zu Minimalversion:
+ok SP-2 geht jetzt, wenn ich case when SP rausmach
+ok und SP-2 geht tatsächlich nicht, wenn case when SP wieder rein
+OK also weiter wieder Extras rein...ok geht
