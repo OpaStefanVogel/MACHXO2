@@ -388,3 +388,5 @@ ok und SP-2 geht tatsächlich nicht, wenn case when SP wieder rein
 OK also weiter wieder Extras rein...ok geht
 OK SPIS und PID aucH wieder rein...ok sogar PID geht!!!
 ok Suuuuper, 25 MHz gehen auch wieder!!!
+OK jetzt die LED's wieder in Ausgangszustand bringen und so paar Kleinigkeiten...ok
+.. warum geht "and FFFD" nicht raus bei ADRESSE_ZUM_STAPEL?

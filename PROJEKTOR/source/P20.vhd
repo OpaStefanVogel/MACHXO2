@@ -405,10 +405,6 @@ begin wait until (CLK_I'event and CLK_I='1');
   ADRESSE_ZUM_STAPEL(1)<=CONV_STD_LOGIC_VECTOR(SP-2,16) and x"FFFD";
   ADRESSE_ZUM_STAPEL(2)<=CONV_STD_LOGIC_VECTOR(SP-3,16) or x"0002";
   ADRESSE_ZUM_STAPEL(3)<=CONV_STD_LOGIC_VECTOR(SP-4,16) or x"0002";
-  --ADRESSE_ZUM_STAPEL(0)<=CONV_UNSIGNED(SP-1,16) and x"FFFD";
-  --ADRESSE_ZUM_STAPEL(1)<=CONV_UNSIGNED(SP-2,16) and x"FFFD";
-  --ADRESSE_ZUM_STAPEL(2)<=CONV_UNSIGNED(SP-3,16) or x"0002";
-  --ADRESSE_ZUM_STAPEL(3)<=CONV_UNSIGNED(SP-4,16) or x"0002";
   STORE_ZUM_STAPEL(0)<=R(0);
   STORE_ZUM_STAPEL(1)<=R(1);
   STORE_ZUM_STAPEL(2)<=R(2);
@@ -477,7 +473,7 @@ begin wait until (CLK6_I'event and CLK6_I='1');
 --                  120C bei 115200 und 53.2 MHz
 --      if stoppbit='1' then
           dbInput<=dbInput_L;
---          STRG<=not STRG_MERK_RUHEND;
+          STRG<=not STRG_MERK_RUHEND;
 --        end if;		  
       else 
         if scount>0 then scount:=scount+08; -- D0000, D000 statt 1100

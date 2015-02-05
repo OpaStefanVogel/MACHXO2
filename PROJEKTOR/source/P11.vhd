@@ -91,14 +91,14 @@ begin
 process begin wait until (CLK_I'event and CLK_I='0');
   if WE_I='1' then
     if ADR_I=x"2D04" then LEDX<=DAT_I(7 downto 0); 
-    --elsif ADR_I=x"2C20" then LED(0)<=DAT_I(0); 
-    --elsif ADR_I=x"2C21" then LED(1)<=DAT_I(0); 
-    --elsif ADR_I=x"2C22" then LED(2)<=DAT_I(0); 
-    --elsif ADR_I=x"2C23" then LED(3)<=DAT_I(0); 
-    --elsif ADR_I=x"2C24" then LED(4)<=DAT_I(0); 
-    --elsif ADR_I=x"2C25" then LED(5)<=DAT_I(0); 
-    --elsif ADR_I=x"2C26" then LED(6)<=DAT_I(0); 
-    --elsif ADR_I=x"2C27" then LED(7)<=DAT_I(0); 
+    elsif ADR_I=x"2C20" then LEDX(0)<=DAT_I(0); 
+    elsif ADR_I=x"2C21" then LEDX(1)<=DAT_I(0); 
+    elsif ADR_I=x"2C22" then LEDX(2)<=DAT_I(0); 
+    elsif ADR_I=x"2C23" then LEDX(3)<=DAT_I(0); 
+    elsif ADR_I=x"2C24" then LEDX(4)<=DAT_I(0); 
+    elsif ADR_I=x"2C25" then LEDX(5)<=DAT_I(0); 
+    elsif ADR_I=x"2C26" then LEDX(6)<=DAT_I(0); 
+    elsif ADR_I=x"2C27" then LEDX(7)<=DAT_I(0); 
     end if; end if;
   end process;
 LED<=LEDX;

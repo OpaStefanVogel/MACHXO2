@@ -290,7 +290,7 @@ Fassung_P: FortyForthProzessor
   port map (
     RxD=>RS232_RXD,
     TxD=>RS232_TXD,
-    INTXY=>'0',--UFM_INT_XY,--RS232_RXD,--INTXY,
+    INTXY=>UFM_INT_XY,--RS232_RXD,--INTXY,
 
     CLK50_I=>CLK_50,
     CLK50_O=>open,
@@ -508,39 +508,14 @@ IO_EXTRA(38)<=POS_B;
 --IO_N(20); --POS_A und B auf LED7
 
 --LED<=not(IO(20 downto 13));
-LED_0<=not NLED(0);--not SIM_PC(0);--not SIM_PC(0);--not NLED(0);
-LED_1<=not NLED(1);--not SIM_PC(1);--not SIM_PC(1);--not NLED(1);
-LED_2<=not NLED(2);--not SIM_PC(2);--nnot NLED(2);--not SIM_PC(2);--not NLED(2);
-LED_3<=not NLED(3);--not SIM_PC(3);--nnot NLED(3);--not SIM_PC(3);--CLK_I;
-LED_4<=not NLED(4);--not SIM_PC(4);--nnot NLED(4);--not SIM_PC(4);--'0';
-LED_5<=not NLED(5);--not SIM_PC(5);--nnot NLED(5);--not SIM_PC(5);--TAKTZAEHLER(22);
-LED_6<=not WE_I;--'0';
-LED_7<=CLK_I;--SPI_SCSN;
---LED_6<=not NLED(6);--not SIM_PC(6);--'0';
---LED_2<=not DAT_ZU_LED(0);--not SIM_PC(4);--nnot NLED(4);--not SIM_PC(4);--'0';
---LED_3<=not DAT_ZU_LED(1);--not NLED(5);--not SIM_PC(5);--nnot NLED(5);--not SIM_PC(5);--TAKTZAEHLER(22);
---LED_4<=not SIM_PC(0);--Wnot NLED(2);--not SIM_PC(2);--nnot NLED(2);--not SIM_PC(2);--not NLED(2);
---LED_5<=not SIM_PC(1);--not NLED(3);--not SIM_PC(3);--nnot NLED(3);--not SIM_PC(3);--CLK_I;
---LED_6<=not WE_I;--not NLED(6);--not SIM_PC(6);--'0';
---LED_7<=not NLED(7);--CLK_I;--SPI_SCSN;
---LED_0<=not SIM_PC(0);--not SIM_PC(0);--not NLED(0);
---LED_1<=not SIM_PC(1);--not SIM_PC(1);--not NLED(1);
---LED_2<=not SIM_PC(2);--nnot NLED(2);--not SIM_PC(2);--not NLED(2);
---LED_3<=not SIM_PC(3);--nnot NLED(3);--not SIM_PC(3);--CLK_I;
---LED_4<=not SIM_PC(4);--nnot NLED(4);--not SIM_PC(4);--'0';
---LED_5<=not SIM_PC(5);--nnot NLED(5);--not SIM_PC(5);--TAKTZAEHLER(22);
---LED_0<=not SIM_PC(8);--not SIM_PC(0);--not NLED(0);
---LED_1<=not SIM_PC(9);--not SIM_PC(1);--not NLED(1);
---LED_2<=not SIM_PC(10);--nnot NLED(2);--not SIM_PC(2);--not NLED(2);
---LED_3<=not SIM_PC(11);--nnot NLED(3);--not SIM_PC(3);--CLK_I;
---LED_4<=not SIM_PC(12);--nnot NLED(4);--not SIM_PC(4);--'0';
---LED_5<=not SIM_PC(13);--nnot NLED(5);--not SIM_PC(5);--TAKTZAEHLER(22);
---LED_6<=not SIM_PC(6);--'0';
---LED_0<=not ADR_I(0);--not SIM_PC(0);--not NLED(0);
---LED_1<=not ADR_I(1);--not SIM_PC(1);--not NLED(1);
---LED_2<=not ADR_I(2);--nnot NLED(2);--not SIM_PC(2);--not NLED(2);
---LED_3<=not ADR_I(3);--nnot NLED(3);--not SIM_PC(3);--CLK_I;
---LED_4<=not ADR_I(4);--nnot NLED(4);--not SIM_PC(4);--'0';
---LED_5<=not ADR_I(5);--nnot NLED(5);--not SIM_PC(5);--TAKTZAEHLER(22);
---SPI_MISO<=NLED(7);
+LED_0<=not NLED(0);
+LED_1<=not NLED(1);
+LED_2<=not NLED(2);
+LED_3<=not NLED(3);
+LED_4<=not NLED(4);
+LED_5<=not NLED(5);
+LED_6<=not NLED(6);
+LED_7<=not NLED(7);
+--LED_6<=not WE_I;--'0';
+--LED_7<=CLK_I;--SPI_SCSN;
 end Striezel;
