@@ -11,7 +11,15 @@ entity Platine01 is
     RS232_RXD: in  STD_LOGIC;
     RS232_TXD: out STD_LOGIC;
 --===LED'S
-    LED: inout STD_LOGIC_VECTOR (7 downto 0);
+--    LED: inout STD_LOGIC_VECTOR (7 downto 0);
+    LED_7: out STD_LOGIC;
+    LED_6: out STD_LOGIC;
+    LED_5: out STD_LOGIC;
+    LED_4: out STD_LOGIC;
+    LED_3: out STD_LOGIC;
+    LED_2: out STD_LOGIC;
+    LED_1: out STD_LOGIC;
+    LED_0: out STD_LOGIC;
 --====WIZ
     WIZ_nSS: out STD_LOGIC;
     WIZ_nINT: in STD_LOGIC;
@@ -64,7 +72,8 @@ component FortyForthProzessor is
     CLK_O: out STD_LOGIC;
     ADR_O: out STD_LOGIC_VECTOR (15 downto 0);
     DAT_O: out STD_LOGIC_VECTOR (15 downto 0);
-    WE_O: out STD_LOGIC
+    WE_O: out STD_LOGIC;
+  SIM_PC: out STD_LOGIC_VECTOR (15 downto 0)
     );
 end component;
 for all : FortyForthProzessor use entity work.Platine20(CR4000);
@@ -274,8 +283,9 @@ signal IO,IO_N: STD_LOGIC_VECTOR (34 downto 1);
 signal IO_EXTRA: STD_LOGIC_VECTOR (40 downto 35);
 signal INTXY,UFM_INT_XY,NULLI: STD_LOGIC;
 
+signal SIM_PC: STD_LOGIC_VECTOR (15 downto 0);
 begin
-
+--RS232_TXD<=RS232_RXD;
 Fassung_P: FortyForthProzessor
   port map (
     RxD=>RS232_RXD,
@@ -295,7 +305,10 @@ Fassung_P: FortyForthProzessor
     CLK_O=>open,
     ADR_O=>ADR_I,
     DAT_O=>DAT_ZU_CLK,
-    WE_O=>WE_I
+    WE_O=>WE_I,
+    
+  SIM_PC=>SIM_PC
+
     );
 
 Fassung_CLK: CLK_Prozessor
@@ -495,7 +508,14 @@ IO_EXTRA(38)<=POS_B;
 --IO_N(20); --POS_A und B auf LED7
 
 --LED<=not(IO(20 downto 13));
-LED(6 downto 0)<=not NLED(6 downto 0);
-LED(7)<=SPI_SCSN;
---SPI_MISO<=NLED(7);
+LED_0<=not NLED(0);
+LED_1<=not NLED(1);
+LED_2<=not NLED(2);
+LED_3<=not NLED(3);
+LED_4<=not NLED(4);
+LED_5<=not NLED(5);
+LED_6<=not NLED(6);
+LED_7<=not NLED(7);
+--LED_6<=not WE_I;--'0';
+--LED_7<=CLK_I;--SPI_SCSN;
 end Striezel;

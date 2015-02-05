@@ -340,6 +340,53 @@ ok .c läuft auch etwa mit gleicher Geschwindigkeit,
 
 </SPI>
 
-
-
-
+ab 20150203:
+So, nun hab ich tüchtig zu tun gehabt, dass Diamond3.4 auch läuft, wenigstens bis WiZ ok.
+ok UFM ist auch wieder drin
+.. aber SPIS geht schon nicht mehr rein, da muss ich noochmal suchen
+.. ich mach dazu nochmal SP-2 statt SP-1-1: geht tatsächlich nicht!
+   .. lustig SP-3+1 geht
+   .. es schaut so aus, als ob SP-2 zweimal ausgeführt wird.
+   .. es kommt auch vor, dass SP-1-1 nach SP-2 nicht mehr geht, 
+      dann eben HIN_HER und UFM wieder raus.
+   .. also _woran liegt das?
+      .. ich mach mal zusätzlich DAT_I als process, EXFET_I geht definitiv nicht
+         DAT_II geht bei SP-1-1 aber nicht bei SP-2, also daran liegt es nicht
+      .. nun versuche ich nochmal .mem neu generieren, weil da eine neue Version sei. nix
+      .. if STRG/=... komplett raus nutzt auch nix
+      .. komisch, wenn ich den RS232-TxD process komplett rausmach, geht SP-1-1 auch nicht
+         naja, muss ja so sein weil dann EMIT wartet
+      .. ohne RS232-RxD process geht SP-1-1 auch nicht, auch komisch.
+      ok jetzt hab ich TXD raus durch Ersatz SCHREIBBIT_X<= 
+      ok jetzt ist auch RXD komplett raus, nachdem ich auch D000 @ deaktiviert habe
+      ok auch sämtliche Kommentare raus und EMIT deaktiviert und alle RXD TXD Variablen
+      .. eigentlich müsste "and FFFD" rausgehen bei ADRESSE_ZUM_STAPEL...
+         denn bei Diamond2.2 funktioniert es ohne
+      .. als nächstes tue ich mal den LED-Prozess ausblenden...
+         aber daran liegt es auch nicht, "and FFFD" muss noch drinbleiben...
+      .. also im Moment geht nichts mehr raus, da mache ich wieder langsame LED's ohne WIZ
+      .. da geht SP-2 immer noch nicht
+      .. jetzt nehm ich mal @ FETCH raus und ramE000, hilft auch nicht
+      .. jetzt ROT SWAP DROP DUP alles zusammen in nur ein minimales DUP, hilft nix
+      .. jetzt 0< MINUS NOT AND OR  U+ U* EMIT komplett raus 
+      ok !!!! aaah da schau her, SP-2 geht wieder!!!! Jetzt bin ich gespannt warum:
+      .. U+ U* hinzu...da geht SP-2 noch
+      .. NOT AND OR hinzu...geht auch
+      .. da muss es ja an 0< oder MINUS liegen, da auch nicht
+      .. aber wenn ich das ausführliche Umstapeln wieder hinzunehme und STORE mit case,
+         dann geht SP-2 nicht mehr
+      ok genauer wenn ich nur in STORE das case wieder aktiviere, geht SP-2 nicht mehr
+      ok noch genauer: PC hinzu geht, RP hinzu geht auch, nachSP hinzu geht's nicht mehr!!!
+      ok nochmal SP alleine ohne PC RP hinzu...ok ja, daran liegt es eindeutig
+      -->ein neues branch ERROR_in_case um das genauer auszudingsen
+      ok so, jetzt versuche ich schnell noch statt dem case ein if... ok hat auch diesen Defekt.
+      Feierabend Schluss für heut.
+      
+Weiter von branch ERROR_in_case_whe_SP zu Minimalversion:
+ok SP-2 geht jetzt, wenn ich case when SP rausmach
+ok und SP-2 geht tatsächlich nicht, wenn case when SP wieder rein
+OK also weiter wieder Extras rein...ok geht
+OK SPIS und PID aucH wieder rein...ok sogar PID geht!!!
+ok Suuuuper, 25 MHz gehen auch wieder!!!
+OK jetzt die LED's wieder in Ausgangszustand bringen und so paar Kleinigkeiten...ok
+.. warum geht "and FFFD" nicht raus bei ADRESSE_ZUM_STAPEL?

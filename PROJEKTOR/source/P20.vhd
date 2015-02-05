@@ -24,7 +24,11 @@ entity Platine20 is
     CLK_O: out STD_LOGIC;
     ADR_O: out STD_LOGIC_VECTOR (15 downto 0);
     DAT_O: out STD_LOGIC_VECTOR (15 downto 0);
-    WE_O: out STD_LOGIC
+    WE_O: out STD_LOGIC;
+    
+  SIM_PC: out STD_LOGIC_VECTOR (15 downto 0)
+    
+    
    );
 end Platine20;
 
@@ -55,11 +59,11 @@ signal RXDI: STD_LOGIC:='1';
 signal FETCHX: STD_LOGIC_VECTOR (15 downto 0);
 signal WSTORE_ZUM_RAM: STD_LOGIC;
 --STRG Tasten:
-signal STRG,STRG_RUHEND,STRG_M,STRG_MERK,STRG_MERK_RUHEND: STD_LOGIC;
+signal STRG,STRG_RUHEND,STRG_M,STRG_MERK,STRG_MERK_RUHEND: STD_LOGIC:='0';
 signal dbInput_RUHEND,dbInput_M: STD_LOGIC_VECTOR (7 downto 0):=x"00"; -- die auszugebende Hexzahl
 
 --INT:
-signal INTXY_INT,INTXY_MERK: STD_LOGIC;
+signal INTXY_INT,INTXY_MERK: STD_LOGIC:='0';
 
 ----IO-Ersatz:
 --signal INTXY: STD_LOGIC;
@@ -78,7 +82,8 @@ type STAPELTYPE is array(0 to 31) of STD_LOGIC_VECTOR (15 downto 0);
 signal stap1,stap2,stap3,stap0: STAPELTYPE;
 
 function P (SP : integer) return integer is begin
-  return CONV_INTEGER(CONV_STD_LOGIC_VECTOR(SP,1024)(1 downto 0));
+--  return CONV_INTEGER(CONV_STD_LOGIC_VECTOR(SP,1024)(1 downto 0));
+  return CONV_INTEGER(CONV_UNSIGNED(SP,2));
   end;
 
 -- parameterized module component declaration
@@ -117,6 +122,7 @@ component ramE000bisFFFF
 end component;
 
 signal EXTRATAKT:  STD_LOGIC;
+signal DUMPD: STD_LOGIC_VECTOR (15 downto 0);
 begin
 
 
@@ -125,7 +131,10 @@ ADR_O<=ADRESSE_ZUM_RAM;
 DAT_O<=STORE_ZUM_RAM;
 WE_O<=WSTORE_ZUM_RAM;
 
-
+--FSuch
+--SIM_PC<=PC_ZUM_RAM;
+SIM_PC<=SP_ZUM_RAM;
+--SIM_PC<=DUMPD;
 
 
 
@@ -202,9 +211,10 @@ begin wait until (CLK_I'event and CLK_I='1');
   A:=R(P(SP-4));
   T:=0;
  
-  if PD="101-1-----------" then  --Returnbit auswerten
-    PC:=RPCC; RP:=RP+1; PD(11):='0';
-    elsif PD(15 downto 14)="01" then -- 4000-7FFF Unterprogrammaufruf
+  --if PD="101-1-----------" then  --Returnbit auswerten
+    --PC:=RPCC; RP:=RP+1; PD(11):='0';
+    --els
+  if PD(15 downto 14)="01" then -- 4000-7FFF Unterprogrammaufruf
 --    when "010-------------" => -- 4000-5FFF Unterprogrammaufruf
       RPC:=PC;
       PC:=PD and x"3FFF";
@@ -268,12 +278,13 @@ begin wait until (CLK_I'event and CLK_I='1');
     elsif PD=x"A009" then -- STORE Speicheradresse beschreiben
       STORE:=C;STOREADRESSE:=D;
       case STOREADRESSE is
-        when "1101000000000001" => SP:=CONV_INTEGER(C);
+        --when "1101000000000001" => SP:=CONV_INTEGER(C);
         when "1101000000000010" => RP:=C;
         when "1101000000000011" => PC:=C;
         when others => WSTORE:='1' ;
         end case;
       T:=0;
+      --SP:=SP-1;SP:=SP-1;
       SP:=SP-2;
     elsif PD=x"A00A" then -- FETCH Speicheradresse lesen
       case D is
@@ -307,7 +318,13 @@ begin wait until (CLK_I'event and CLK_I='1');
       C:=R(P(SP-1-CONV_INTEGER(STAK(3 downto 2))));
       B:=R(P(SP-1-CONV_INTEGER(STAK(5 downto 4))));
       A:=R(P(SP-1-CONV_INTEGER(STAK(7 downto 6))));
-      SP:=SP+CONV_INTEGER(PD(11 downto 8))-4;
+--  DUMPD<=CONV_STD_LOGIC_VECTOR(CONV_INTEGER(PD(11 downto 8)),16);
+      --SP:=SP+CONV_INTEGER(PD(11 downto 8))-4;
+      if PD(11 downto 8)="0010" then SP:=SP-2;
+      elsif PD(11 downto 8)="0011" then SP:=SP-1;
+      elsif PD(11 downto 8)="0101" then SP:=SP+1;
+      elsif PD(11 downto 8)="0110" then SP:=SP+2;
+      end if;
 
 
 
@@ -340,8 +357,8 @@ begin wait until (CLK_I'event and CLK_I='1');
     CRC_SUMME:="00000000"&A(7 downto 0)&B(7 downto 0)&C(7 downto 0)&D(7 downto 0);
     if D(0)/=D(8) then
       CRC_SUMME:=CRC_SUMME xor "0000000111011011011100010000011001000001";
-      --                        -------111011011011100010000011001000001
-      --G(x) = x32x26x23x22x16x12x11x10x8x7x5x4x2x1x0
+           -- --            -------111011011011100010000011001000001
+           --- --- --- G(x) = x32x26x23x22x16x12x11x10x8x7x5x4x2x1x0
       end if;
     D:="0"&D(15 downto 9)&CRC_SUMME(8 downto 1);
     C:="00000000"&CRC_SUMME(16 downto 9);
