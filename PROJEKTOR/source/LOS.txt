@@ -390,3 +390,10 @@ OK SPIS und PID aucH wieder rein...ok sogar PID geht!!!
 ok Suuuuper, 25 MHz gehen auch wieder!!!
 OK jetzt die LED's wieder in Ausgangszustand bringen und so paar Kleinigkeiten...ok
 .. warum geht "and FFFD" nicht raus bei ADRESSE_ZUM_STAPEL?
+.. manchmal geht mit Diamond3.4 programmiertes gar nicht, dann einmal mit 2.2 programmieren.
+hier aber erstmal Schluss für heute
+
+ok als separater Prozess in P01 ist der Feher SP-2 nicht reproduzierbar
+.. da bleibt nur weiter minimieren übrig und das muss ich ja nicht unbedingt machen
+
+
