@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DiamondModule name="ram0000bis1FFF" module="ram0000bis1FFF" VendorName="Lattice Semiconductor Corporation" generator="IPexpress" date="2015 02 04 12:51:18.995" version="7.2" type="Module" synthesis="lse" source_format="VHDL">
+  <Package>
+		<File name="ram0000bis1FFF.lpc" type="lpc" modified="2015 01 19 11:15:56.000"/>
+		<File name="ram0000bis1FFF.vhd" type="top_level_vhdl" modified="2015 01 19 11:15:56.000"/>
+		<File name="ram0000bis1FFF_tmpl.vhd" type="template_vhdl" modified="2015 01 19 10:49:19.000"/>
+		<File name="tb_ram0000bis1FFF_tmpl.vhd" type="testbench_vhdl" modified="2015 01 19 10:49:19.000"/>
+  </Package>
+</DiamondModule>

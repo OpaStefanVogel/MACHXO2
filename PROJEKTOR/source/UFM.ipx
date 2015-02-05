@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DiamondModule name="UFM" module="EFB" VendorName="Lattice Semiconductor Corporation" generator="IPexpress" date="2015 01 19 10:54:59.910" version="1.2" type="Module" synthesis="lse" source_format="VHDL">
+  <Package>
+		<File name="UFM.lpc" type="lpc" modified="2015 01 19 10:54:56.000"/>
+		<File name="UFM.vhd" type="top_level_vhdl" modified="2015 01 19 10:54:56.000"/>
+		<File name="UFM_tmpl.vhd" type="template_vhdl" modified="2015 01 19 10:54:56.000"/>
+  </Package>
+</DiamondModule>
