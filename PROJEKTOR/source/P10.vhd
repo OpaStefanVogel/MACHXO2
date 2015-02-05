@@ -62,7 +62,7 @@ begin wait until (CLK_50MHZ'event and CLK_50MHZ='1');
   CLK_25<=TAKTZAEHLERI(1);
   CLK_12<=TAKTZAEHLERI(3);--normal 3, zum Testen auch 27, 24, 21, 18, 9
   CLK6_O<=TAKTZAEHLERI(2);--momentan immer 2 für seriell RX TX
-CLK_O<=CLK_12; --  if ZFLAG='0' then CLK_O<=CLK_12; else CLK_O<=CLK_25; end if;
+  if ZFLAG='0' then CLK_O<=CLK_12; else CLK_O<=CLK_25; end if;
   end process;
 
 TAKTZAEHLER<=TAKTZAEHLERI;

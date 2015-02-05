@@ -386,3 +386,5 @@ Weiter von branch ERROR_in_case_whe_SP zu Minimalversion:
 ok SP-2 geht jetzt, wenn ich case when SP rausmach
 ok und SP-2 geht tatsächlich nicht, wenn case when SP wieder rein
 OK also weiter wieder Extras rein...ok geht
+OK SPIS und PID aucH wieder rein...ok sogar PID geht!!!
+ok Suuuuper, 25 MHz gehen auch wieder!!!
