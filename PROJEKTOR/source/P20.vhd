@@ -278,13 +278,14 @@ begin wait until (CLK_I'event and CLK_I='1');
     elsif PD=x"A009" then -- STORE Speicheradresse beschreiben
       STORE:=C;STOREADRESSE:=D;
       case STOREADRESSE is
-        when "1101000000000001" => SP:=CONV_INTEGER(C);
+        --when "1101000000000001" => SP:=CONV_INTEGER(C);
         when "1101000000000010" => RP:=C;
         when "1101000000000011" => PC:=C;
         when others => WSTORE:='1' ;
         end case;
       T:=0;
-      SP:=SP-1;SP:=SP-1;
+      --SP:=SP-1;SP:=SP-1;
+      SP:=SP-2;
     elsif PD=x"A00A" then -- FETCH Speicheradresse lesen
       case D is
         when x"D000" => D:=x"00"&KEYCODE_L;
