@@ -395,5 +395,6 @@ hier aber erstmal Schluss für heute
 
 ok als separater Prozess in P01 ist der Feher SP-2 nicht reproduzierbar
 .. da bleibt nur weiter minimieren übrig und das muss ich ja nicht unbedingt machen
+.. huuu jetzt hab ich mich mit dem LOS.txt in git verheddert 
 
 
