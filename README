@@ -26,3 +26,9 @@ AA 2D04 ! ( *.*.*.*. )
 
 RESET
 
+-----------------------------------------------------------------------
+2 5 * . ( einfache Rechenaufgabe, nur hexadezimal )
+4009 L . ( WIZ-Adresse 4009 lesen und ausgeben )
+77 4009 M ( 77 auf WIZ-Adresse 4009 speichern )
+ESTADUMP ( Inhalt der Socket-Register 4000-47FF ausgeben )
+
